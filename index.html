@@ -11,7 +11,8 @@
     content="width=device-width,
              initial-scale=1.0,
              maximum-scale=1.0,
-             user-scalable=no"
+             user-scalable=no,
+             viewport-fit=cover"
 >
 
 <title>The Snake</title>
@@ -326,104 +327,6 @@ canvas {
 
 
 /* =================================
-   MOBILE CONTROLS
-   ================================= */
-
-#mobileControls {
-
-    display: none;
-
-    position: absolute;
-
-    bottom: 15px;
-
-    left: 50%;
-
-    transform:
-        translateX(-50%);
-
-    width: 180px;
-
-    height: 145px;
-
-    z-index: 50;
-}
-
-
-.mobileBtn {
-
-    position: absolute;
-
-    width: 55px;
-    height: 55px;
-
-    border-radius: 14px;
-
-    border:
-        1px solid #333;
-
-    background:
-        rgba(20,20,20,0.9);
-
-    color: #aaa;
-
-    font-size: 24px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    user-select: none;
-
-    -webkit-user-select: none;
-
-    box-shadow:
-        0 0 15px
-        rgba(0,255,100,0.05);
-}
-
-
-.mobileBtn:active {
-
-    background: #00cc55;
-
-    color: #050505;
-
-    transform: scale(0.92);
-}
-
-
-#upBtn {
-
-    top: 0;
-    left: 62px;
-}
-
-
-#leftBtn {
-
-    top: 62px;
-    left: 0;
-}
-
-
-#downBtn {
-
-    top: 62px;
-    left: 62px;
-}
-
-
-#rightBtn {
-
-    top: 62px;
-    left: 124px;
-}
-
-
-/* =================================
    GAME OVER
    ================================= */
 
@@ -612,6 +515,26 @@ canvas {
 
 
 /* =================================
+   FULLSCREEN MODE
+   ================================= */
+
+:fullscreen #navbar {
+
+    height: 64px;
+}
+
+
+:fullscreen #gameContainer {
+
+    top: 64px;
+
+    width: 100vw;
+
+    height: calc(100vh - 64px);
+}
+
+
+/* =================================
    MOBILE
    ================================= */
 
@@ -685,12 +608,6 @@ canvas {
     }
 
 
-    #mobileControls {
-
-        display: block;
-    }
-
-
     .gameOverBox {
 
         padding: 35px 20px;
@@ -708,6 +625,27 @@ canvas {
     .gameOverIcon {
 
         font-size: 45px;
+    }
+}
+
+
+/* =================================
+   MOBILE FULLSCREEN
+   ================================= */
+
+@media (max-width: 700px) {
+
+    :fullscreen #navbar {
+
+        height: 55px;
+    }
+
+
+    :fullscreen #gameContainer {
+
+        top: 55px;
+
+        height: calc(100vh - 55px);
     }
 }
 
@@ -807,42 +745,6 @@ canvas {
     <div id="controls">
 
         WASD / ARROW KEYS • MOVE
-
-    </div>
-
-
-
-    <!-- MOBILE -->
-
-    <div id="mobileControls">
-
-        <div
-            class="mobileBtn"
-            id="upBtn"
-        >
-            ▲
-        </div>
-
-        <div
-            class="mobileBtn"
-            id="leftBtn"
-        >
-            ◀
-        </div>
-
-        <div
-            class="mobileBtn"
-            id="downBtn"
-        >
-            ▼
-        </div>
-
-        <div
-            class="mobileBtn"
-            id="rightBtn"
-        >
-            ▶
-        </div>
 
     </div>
 
@@ -949,12 +851,124 @@ let gameSpeed = 115;
 
 let lastTime = 0;
 
+let animationFrameId = null;
+
 
 /* =================================
-   ANIMATION FRAME
+   TOUCH SWIPE
    ================================= */
 
-let animationFrameId = null;
+let touchStartX = 0;
+
+let touchStartY = 0;
+
+
+document.addEventListener(
+    "touchstart",
+    event => {
+
+        if (
+            event.touches.length !== 1
+        ) {
+            return;
+        }
+
+
+        touchStartX =
+            event.touches[0].clientX;
+
+        touchStartY =
+            event.touches[0].clientY;
+    },
+    {
+        passive: true
+    }
+);
+
+
+document.addEventListener(
+    "touchend",
+    event => {
+
+        if (
+            event.changedTouches.length !== 1
+        ) {
+            return;
+        }
+
+
+        const touch =
+            event.changedTouches[0];
+
+
+        const deltaX =
+            touch.clientX -
+            touchStartX;
+
+        const deltaY =
+            touch.clientY -
+            touchStartY;
+
+
+        const minSwipeDistance = 25;
+
+
+        if (
+
+            Math.abs(deltaX) <
+            minSwipeDistance &&
+
+            Math.abs(deltaY) <
+            minSwipeDistance
+
+        ) {
+
+            return;
+        }
+
+
+        if (
+            Math.abs(deltaX) >
+            Math.abs(deltaY)
+        ) {
+
+            if (deltaX > 0) {
+
+                setDirection(
+                    1,
+                    0
+                );
+
+            } else {
+
+                setDirection(
+                    -1,
+                    0
+                );
+            }
+
+        } else {
+
+            if (deltaY > 0) {
+
+                setDirection(
+                    0,
+                    1
+                );
+
+            } else {
+
+                setDirection(
+                    0,
+                    -1
+                );
+            }
+        }
+    },
+    {
+        passive: true
+    }
+);
 
 
 /* =================================
@@ -1029,11 +1043,6 @@ function resizeCanvas() {
    ================================= */
 
 function startGame() {
-
-    /*
-       Cancel any previous
-       animation frame.
-    */
 
     if (
         animationFrameId !== null
@@ -1230,10 +1239,6 @@ function createEatEffect(x, y) {
         });
     }
 
-
-    /*
-       Snake changes color
-    */
 
     eatColorEffect = 1;
 }
@@ -1697,10 +1702,6 @@ function drawFood() {
         "#ff3030";
 
 
-    /*
-       Apple
-    */
-
     ctx.beginPath();
 
     ctx.arc(
@@ -1735,10 +1736,6 @@ function drawFood() {
     ctx.fill();
 
 
-    /*
-       Stem
-    */
-
     ctx.shadowBlur = 0;
 
     ctx.strokeStyle =
@@ -1761,10 +1758,6 @@ function drawFood() {
 
     ctx.stroke();
 
-
-    /*
-       Leaf
-    */
 
     ctx.fillStyle =
         "#00dd55";
@@ -1814,11 +1807,6 @@ function drawSnake() {
 
             let color;
 
-
-            /*
-               Temporary color
-               when eating
-            */
 
             if (
                 eatColorEffect > 0
@@ -2054,10 +2042,6 @@ function draw() {
     ctx.save();
 
 
-    /*
-       Shake
-    */
-
     if (
         screenShake > 0
     ) {
@@ -2093,10 +2077,6 @@ function draw() {
 
     drawParticles();
 
-
-    /*
-       Red flash
-    */
 
     if (
         redFlash > 0
@@ -2137,10 +2117,6 @@ function gameLoop(time) {
     updateParticles();
 
 
-    /*
-       Snake color fade
-    */
-
     if (
         eatColorEffect > 0
     ) {
@@ -2158,10 +2134,6 @@ function gameLoop(time) {
     }
 
 
-    /*
-       Death animation
-    */
-
     if (
         deathAnimation
     ) {
@@ -2170,10 +2142,6 @@ function gameLoop(time) {
             0.016;
     }
 
-
-    /*
-       GAME
-    */
 
     if (
         gameRunning
@@ -2194,10 +2162,6 @@ function gameLoop(time) {
 
     draw();
 
-
-    /*
-       Continue rendering
-    */
 
     if (
 
@@ -2234,10 +2198,6 @@ document.addEventListener(
         const key =
             event.key.toLowerCase();
 
-
-        /*
-           WASD + ARROWS
-        */
 
         if (
 
@@ -2323,10 +2283,6 @@ document.addEventListener(
         }
 
 
-        /*
-           SPACE
-        */
-
         else if (
             key === " " &&
             !gameRunning &&
@@ -2342,18 +2298,13 @@ document.addEventListener(
 
 
 /* =================================
-   MOBILE CONTROLS
+   DIRECTION
    ================================= */
 
 function setDirection(
     x,
     y
 ) {
-
-    /*
-       Prevent instant 180°
-       degree turns.
-    */
 
     if (
         x !== -direction.x ||
@@ -2368,99 +2319,74 @@ function setDirection(
 }
 
 
-/*
-   Touch / mouse support
-*/
-
-function mobileButton(
-    id,
-    x,
-    y
-) {
-
-    const button =
-        document.getElementById(id);
-
-
-    button.addEventListener(
-        "touchstart",
-        event => {
-
-            event.preventDefault();
-
-            setDirection(
-                x,
-                y
-            );
-        },
-        {
-            passive: false
-        }
-    );
-
-
-    button.addEventListener(
-        "mousedown",
-        event => {
-
-            event.preventDefault();
-
-            setDirection(
-                x,
-                y
-            );
-        }
-    );
-}
-
-
-mobileButton(
-    "upBtn",
-    0,
-    -1
-);
-
-
-mobileButton(
-    "leftBtn",
-    -1,
-    0
-);
-
-
-mobileButton(
-    "downBtn",
-    0,
-    1
-);
-
-
-mobileButton(
-    "rightBtn",
-    1,
-    0
-);
-
-
 /* =================================
    FULLSCREEN
    ================================= */
 
-function toggleFullscreen() {
+async function toggleFullscreen() {
 
-    if (
-        !document.fullscreenElement
-    ) {
+    try {
 
-        document.documentElement
-            .requestFullscreen()
-            .catch(() => {});
+        if (
+            !document.fullscreenElement
+        ) {
 
-    } else {
+            await document.documentElement
+                .requestFullscreen();
 
-        document.exitFullscreen();
+        } else {
+
+            await document.exitFullscreen();
+        }
+
+    } catch (error) {
+
+        /*
+           Fullscreen can be restricted
+           by some mobile browsers.
+        */
+
     }
+
+    
+    setTimeout(
+        () => {
+
+            resizeCanvas();
+
+            if (
+                snake &&
+                food
+            ) {
+
+                draw();
+            }
+
+        },
+        100
+    );
 }
+
+
+/* =================================
+   FULLSCREEN CHANGE
+   ================================= */
+
+document.addEventListener(
+    "fullscreenchange",
+    () => {
+
+        resizeCanvas();
+
+        if (
+            snake &&
+            food
+        ) {
+
+            draw();
+        }
+    }
+);
 
 
 /* =================================
@@ -2498,4 +2424,3 @@ startGame();
 
 </html>
 ```
-
