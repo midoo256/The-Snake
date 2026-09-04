@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 
@@ -181,6 +180,9 @@ body {
     height:
         calc(100vh - 64px);
 
+    height:
+        calc(100dvh - 64px);
+
     display: flex;
 
     align-items: center;
@@ -298,6 +300,9 @@ canvas {
     box-shadow:
         0 0 50px
         rgba(0,255,100,0.08);
+
+    max-width: 100%;
+    max-height: 100%;
 }
 
 
@@ -531,6 +536,8 @@ canvas {
     width: 100vw;
 
     height: calc(100vh - 64px);
+
+    height: calc(100dvh - 64px);
 }
 
 
@@ -554,6 +561,9 @@ canvas {
 
         height:
             calc(100vh - 55px);
+
+        height:
+            calc(100dvh - 55px);
     }
 
 
@@ -646,6 +656,8 @@ canvas {
         top: 55px;
 
         height: calc(100vh - 55px);
+
+        height: calc(100dvh - 55px);
     }
 }
 
@@ -855,6 +867,119 @@ let animationFrameId = null;
 
 
 /* =================================
+   FRUITS
+   ================================= */
+
+const fruits = [
+
+    {
+        type: "apple",
+        color: "#ff3030",
+        glow: "#ff3030"
+    },
+
+    {
+        type: "orange",
+        color: "#ff8c00",
+        glow: "#ff8c00"
+    },
+
+    {
+        type: "lemon",
+        color: "#ffe600",
+        glow: "#ffe600"
+    },
+
+    {
+        type: "strawberry",
+        color: "#ff1744",
+        glow: "#ff1744"
+    },
+
+    {
+        type: "grape",
+        color: "#9b59ff",
+        glow: "#9b59ff"
+    },
+
+    {
+        type: "watermelon",
+        color: "#00dd55",
+        glow: "#00ff66"
+    }
+
+];
+
+
+let currentFruit;
+
+
+/* =================================
+   SNAKE COLORS
+   ================================= */
+
+const snakeColors = [
+
+    {
+        main: "#00ff66",
+        body: "#00cc55"
+    },
+
+    {
+        main: "#00e5ff",
+        body: "#00aacc"
+    },
+
+    {
+        main: "#b000ff",
+        body: "#8700cc"
+    },
+
+    {
+        main: "#ff3cac",
+        body: "#d9007f"
+    },
+
+    {
+        main: "#ff9f00",
+        body: "#dd7700"
+    },
+
+    {
+        main: "#ffe600",
+        body: "#d6c000"
+    },
+
+    {
+        main: "#ff3030",
+        body: "#cc2020"
+    },
+
+    {
+        main: "#ffffff",
+        body: "#bbbbbb"
+    }
+
+];
+
+
+let currentSnakeColor;
+
+
+/* =================================
+   OBSTACLES
+   ================================= */
+
+let obstacles = [];
+
+let obstacleParticles = [];
+
+let obstacleCount = 0;
+
+let obstacleFlash = 0;
+
+
+/* =================================
    TOUCH SWIPE
    ================================= */
 
@@ -1008,11 +1133,30 @@ highScoreElement.textContent =
 
 function resizeCanvas() {
 
-    const width =
+    let width =
         window.innerWidth - 8;
 
-    const height =
+    let height =
         window.innerHeight - 8;
+
+
+    if (
+        window.matchMedia(
+            "(max-width: 700px)"
+        ).matches
+    ) {
+
+        const navbarHeight =
+            document.fullscreenElement
+                ? 55
+                : 55;
+
+        height =
+            window.innerHeight -
+            navbarHeight -
+            8;
+    }
+
 
     const size =
         Math.min(
@@ -1022,15 +1166,16 @@ function resizeCanvas() {
 
 
     canvas.width =
-        Math.floor(
-            size / GRID
-        ) * GRID;
+        Math.max(
+            GRID,
+            Math.floor(
+                size / GRID
+            ) * GRID
+        );
 
 
     canvas.height =
-        Math.floor(
-            size / GRID
-        ) * GRID;
+        canvas.width;
 
 
     tileSize =
@@ -1106,6 +1251,14 @@ function startGame() {
 
     foodParticles = [];
 
+    obstacleParticles = [];
+
+    obstacles = [];
+
+    obstacleCount = 0;
+
+    obstacleFlash = 0;
+
     eatColorEffect = 0;
 
     foodPulse = 0;
@@ -1119,6 +1272,19 @@ function startGame() {
     redFlash = 0;
 
     gameOverReady = false;
+
+
+    currentSnakeColor =
+        snakeColors[0];
+
+
+    currentFruit =
+        fruits[
+            Math.floor(
+                Math.random() *
+                fruits.length
+            )
+        ];
 
 
     scoreElement.textContent =
@@ -1160,19 +1326,25 @@ function spawnFood() {
 
     while (!valid) {
 
+        /*
+           Keep food away from the
+           outer edge so its shape
+           can never be clipped.
+        */
+
         food = {
 
             x:
                 Math.floor(
                     Math.random() *
-                    GRID
-                ),
+                    (GRID - 4)
+                ) + 2,
 
             y:
                 Math.floor(
                     Math.random() *
-                    GRID
-                )
+                    (GRID - 4)
+                ) + 2
         };
 
 
@@ -1182,7 +1354,48 @@ function spawnFood() {
                     part.x === food.x &&
                     part.y === food.y
             );
+
+
+        if (valid) {
+
+            valid =
+                !obstacles.some(
+                    obstacle =>
+                        obstacle.x === food.x &&
+                        obstacle.y === food.y
+                );
+        }
     }
+
+
+    /*
+       Make sure the next fruit
+       is different from the
+       previous one whenever possible.
+    */
+
+    let nextFruit;
+
+    do {
+
+        nextFruit =
+            fruits[
+                Math.floor(
+                    Math.random() *
+                    fruits.length
+                )
+            ];
+
+    } while (
+
+        fruits.length > 1 &&
+        nextFruit.type === currentFruit.type
+
+    );
+
+
+    currentFruit =
+        nextFruit;
 
 
     foodPulse = 0;
@@ -1190,10 +1403,399 @@ function spawnFood() {
 
 
 /* =================================
+   OBSTACLE SYSTEM
+   ================================= */
+
+function shouldAddObstacle() {
+
+    return (
+        score >= 4 &&
+        score % 4 === 0
+    );
+}
+
+
+function addObstacle() {
+
+    if (
+        obstacleCount >= 14
+    ) {
+        return;
+    }
+
+
+    let valid = false;
+
+    let newObstacle;
+
+
+    let attempts = 0;
+
+
+    while (
+        !valid &&
+        attempts < 300
+    ) {
+
+        attempts++;
+
+
+        newObstacle = {
+
+            x:
+                Math.floor(
+                    Math.random() *
+                    (GRID - 4)
+                ) + 2,
+
+            y:
+                Math.floor(
+                    Math.random() *
+                    (GRID - 4)
+                ) + 2
+        };
+
+
+        valid =
+            !snake.some(
+                part =>
+                    part.x === newObstacle.x &&
+                    part.y === newObstacle.y
+            );
+
+
+        if (
+            valid &&
+            food
+        ) {
+
+            valid =
+                !(
+                    newObstacle.x === food.x &&
+                    newObstacle.y === food.y
+                );
+        }
+
+
+        if (valid) {
+
+            valid =
+                !obstacles.some(
+                    obstacle =>
+                        obstacle.x === newObstacle.x &&
+                        obstacle.y === newObstacle.y
+                );
+        }
+
+
+        /*
+           Don't put an obstacle directly
+           beside the snake head.
+        */
+
+        if (
+            valid &&
+            snake[0]
+        ) {
+
+            const distance =
+                Math.abs(
+                    newObstacle.x -
+                    snake[0].x
+                ) +
+                Math.abs(
+                    newObstacle.y -
+                    snake[0].y
+                );
+
+
+            if (
+                distance < 4
+            ) {
+
+                valid = false;
+            }
+        }
+    }
+
+
+    if (!valid)
+        return;
+
+
+    obstacles.push(
+        newObstacle
+    );
+
+
+    obstacleCount++;
+
+
+    createObstacleAppearEffect(
+        newObstacle.x,
+        newObstacle.y
+    );
+}
+
+
+/* =================================
+   OBSTACLE APPEAR EFFECT
+   ================================= */
+
+function createObstacleAppearEffect(
+    x,
+    y
+) {
+
+    const centerX =
+        x * tileSize +
+        tileSize / 2;
+
+    const centerY =
+        y * tileSize +
+        tileSize / 2;
+
+
+    for (
+        let i = 0;
+        i < 18;
+        i++
+    ) {
+
+        const angle =
+            Math.random() *
+            Math.PI * 2;
+
+        const speed =
+            Math.random() * 3 + 1;
+
+
+        obstacleParticles.push({
+
+            x: centerX,
+
+            y: centerY,
+
+            vx:
+                Math.cos(angle) *
+                speed,
+
+            vy:
+                Math.sin(angle) *
+                speed,
+
+            size:
+                Math.random() * 4 + 2,
+
+            life: 1,
+
+            color:
+                "#ff8c00"
+        });
+    }
+}
+
+
+/* =================================
+   OBSTACLE EXPLOSION
+   ================================= */
+
+function createObstacleExplosion(
+    obstacle
+) {
+
+    const centerX =
+        obstacle.x * tileSize +
+        tileSize / 2;
+
+    const centerY =
+        obstacle.y * tileSize +
+        tileSize / 2;
+
+
+    screenShake = 16;
+
+    obstacleFlash = 1;
+
+
+    for (
+        let i = 0;
+        i < 35;
+        i++
+    ) {
+
+        const angle =
+            Math.random() *
+            Math.PI * 2;
+
+        const speed =
+            Math.random() * 8 + 2;
+
+
+        obstacleParticles.push({
+
+            x: centerX,
+
+            y: centerY,
+
+            vx:
+                Math.cos(angle) *
+                speed,
+
+            vy:
+                Math.sin(angle) *
+                speed,
+
+            size:
+                Math.random() * 7 + 2,
+
+            life: 1,
+
+            color:
+                Math.random() > 0.5
+                    ? "#ff3030"
+                    : "#ff9f00"
+        });
+    }
+}
+
+
+/* =================================
+   OBSTACLE COLLISION
+   ================================= */
+
+function checkObstacleCollision(
+    head
+) {
+
+    return obstacles.some(
+        obstacle =>
+            obstacle.x === head.x &&
+            obstacle.y === head.y
+    );
+}
+
+
+/* =================================
+   DRAW OBSTACLES
+   ================================= */
+
+function drawObstacles() {
+
+    if (
+        deathAnimation
+    ) {
+        return;
+    }
+
+
+    obstacles.forEach(
+        obstacle => {
+
+            const x =
+                obstacle.x *
+                tileSize +
+                tileSize / 2;
+
+            const y =
+                obstacle.y *
+                tileSize +
+                tileSize / 2;
+
+
+            const size =
+                tileSize * 0.62;
+
+
+            ctx.save();
+
+
+            ctx.translate(
+                x,
+                y
+            );
+
+
+            ctx.rotate(
+                Math.PI / 4
+            );
+
+
+            ctx.shadowBlur = 18;
+
+            ctx.shadowColor =
+                "#ff3030";
+
+
+            ctx.fillStyle =
+                "#161616";
+
+
+            ctx.strokeStyle =
+                "#ff3030";
+
+
+            ctx.lineWidth = 2;
+
+
+            ctx.beginPath();
+
+            ctx.roundRect(
+                -size / 2,
+                -size / 2,
+                size,
+                size,
+                tileSize * 0.10
+            );
+
+            ctx.fill();
+
+            ctx.stroke();
+
+
+            ctx.shadowBlur = 0;
+
+
+            ctx.strokeStyle =
+                "#ff9f00";
+
+            ctx.lineWidth = 2;
+
+
+            ctx.beginPath();
+
+            ctx.moveTo(
+                -size * 0.28,
+                -size * 0.10
+            );
+
+            ctx.lineTo(
+                size * 0.05,
+                size * 0.22
+            );
+
+            ctx.lineTo(
+                size * 0.27,
+                -size * 0.25
+            );
+
+            ctx.stroke();
+
+
+            ctx.restore();
+        }
+    );
+}
+
+
+/* =================================
    EAT ANIMATION
    ================================= */
 
-function createEatEffect(x, y) {
+function createEatEffect(
+    x,
+    y
+) {
 
     const centerX =
         x * tileSize +
@@ -1235,7 +1837,10 @@ function createEatEffect(x, y) {
             size:
                 Math.random() * 5 + 2,
 
-            life: 1
+            life: 1,
+
+            color:
+                currentFruit.color
         });
     }
 
@@ -1358,6 +1963,30 @@ function updateParticles() {
         foodParticles.filter(
             p => p.life > 0
         );
+
+
+    obstacleParticles.forEach(p => {
+
+        p.x += p.vx;
+
+        p.y += p.vy;
+
+        p.vx *= 0.97;
+
+        p.vy *= 0.97;
+
+        p.vy += 0.06;
+
+        p.life -= 0.025;
+
+        p.size *= 0.975;
+    });
+
+
+    obstacleParticles =
+        obstacleParticles.filter(
+            p => p.life > 0
+        );
 }
 
 
@@ -1373,12 +2002,12 @@ function drawParticles() {
             p.life;
 
         ctx.fillStyle =
-            "#00ff66";
+            currentSnakeColor.main;
 
         ctx.shadowBlur = 15;
 
         ctx.shadowColor =
-            "#00ff66";
+            currentSnakeColor.main;
 
 
         ctx.beginPath();
@@ -1401,12 +2030,42 @@ function drawParticles() {
             p.life;
 
         ctx.fillStyle =
-            "#ff3030";
+            p.color ||
+            currentFruit.color;
 
         ctx.shadowBlur = 15;
 
         ctx.shadowColor =
-            "#ff3030";
+            p.color ||
+            currentFruit.glow;
+
+
+        ctx.beginPath();
+
+        ctx.arc(
+            p.x,
+            p.y,
+            p.size,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+    });
+
+
+    obstacleParticles.forEach(p => {
+
+        ctx.globalAlpha =
+            p.life;
+
+        ctx.fillStyle =
+            p.color;
+
+        ctx.shadowBlur = 18;
+
+        ctx.shadowColor =
+            p.color;
 
 
         ctx.beginPath();
@@ -1474,6 +2133,40 @@ function update() {
 
 
     /*
+       OBSTACLE
+    */
+
+    const hitObstacle =
+        obstacles.find(
+            obstacle =>
+                obstacle.x === head.x &&
+                obstacle.y === head.y
+        );
+
+
+    if (
+        hitObstacle
+    ) {
+
+        createObstacleExplosion(
+            hitObstacle
+        );
+
+
+        obstacles =
+            obstacles.filter(
+                obstacle =>
+                    obstacle !== hitObstacle
+            );
+
+
+        die();
+
+        return;
+    }
+
+
+    /*
        BODY
     */
 
@@ -1497,7 +2190,7 @@ function update() {
 
 
     /*
-       APPLE
+       APPLE / FRUIT
     */
 
     if (
@@ -1518,6 +2211,36 @@ function update() {
 
         scoreElement.textContent =
             score;
+
+
+        /*
+           Change snake color
+           after every fruit.
+        */
+
+        let newColor;
+
+        do {
+
+            newColor =
+                snakeColors[
+                    Math.floor(
+                        Math.random() *
+                        snakeColors.length
+                    )
+                ];
+
+        } while (
+
+            snakeColors.length > 1 &&
+            newColor.main ===
+            currentSnakeColor.main
+
+        );
+
+
+        currentSnakeColor =
+            newColor;
 
 
         if (
@@ -1544,6 +2267,19 @@ function update() {
                 48,
                 115 - score * 3
             );
+
+
+        /*
+           Add an obstacle every
+           4 points.
+        */
+
+        if (
+            shouldAddObstacle()
+        ) {
+
+            addObstacle();
+        }
 
 
         spawnFood();
@@ -1693,89 +2429,561 @@ function drawFood() {
     );
 
 
-    ctx.shadowBlur = 25;
-
-    ctx.shadowColor =
-        "#ff3030";
-
-    ctx.fillStyle =
-        "#ff3030";
+    const type =
+        currentFruit.type;
 
 
-    ctx.beginPath();
+    /*
+       APPLE
+    */
 
-    ctx.arc(
-        -tileSize * 0.08,
-        0,
-        tileSize * 0.27,
-        0,
-        Math.PI * 2
-    );
+    if (
+        type === "apple"
+    ) {
 
-    ctx.arc(
-        tileSize * 0.08,
-        0,
-        tileSize * 0.27,
-        0,
-        Math.PI * 2
-    );
+        ctx.shadowBlur = 25;
 
-    ctx.fill();
+        ctx.shadowColor =
+            "#ff3030";
+
+        ctx.fillStyle =
+            "#ff3030";
 
 
-    ctx.beginPath();
+        ctx.beginPath();
 
-    ctx.arc(
-        0,
-        tileSize * 0.08,
-        tileSize * 0.30,
-        0,
-        Math.PI * 2
-    );
+        ctx.arc(
+            -tileSize * 0.08,
+            0,
+            tileSize * 0.27,
+            0,
+            Math.PI * 2
+        );
 
-    ctx.fill();
+        ctx.arc(
+            tileSize * 0.08,
+            0,
+            tileSize * 0.27,
+            0,
+            Math.PI * 2
+        );
 
-
-    ctx.shadowBlur = 0;
-
-    ctx.strokeStyle =
-        "#8b5a2b";
-
-    ctx.lineWidth = 3;
-
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-        0,
-        -tileSize * 0.22
-    );
-
-    ctx.lineTo(
-        tileSize * 0.05,
-        -tileSize * 0.38
-    );
-
-    ctx.stroke();
+        ctx.fill();
 
 
-    ctx.fillStyle =
-        "#00dd55";
+        ctx.beginPath();
+
+        ctx.arc(
+            0,
+            tileSize * 0.08,
+            tileSize * 0.30,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
 
 
-    ctx.beginPath();
+        ctx.shadowBlur = 0;
 
-    ctx.ellipse(
-        tileSize * 0.14,
-        -tileSize * 0.34,
-        tileSize * 0.14,
-        tileSize * 0.06,
-        -0.4,
-        0,
-        Math.PI * 2
-    );
+        ctx.strokeStyle =
+            "#8b5a2b";
 
-    ctx.fill();
+        ctx.lineWidth = 3;
+
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            0,
+            -tileSize * 0.22
+        );
+
+        ctx.lineTo(
+            tileSize * 0.05,
+            -tileSize * 0.38
+        );
+
+        ctx.stroke();
+
+
+        ctx.fillStyle =
+            "#00dd55";
+
+
+        ctx.beginPath();
+
+        ctx.ellipse(
+            tileSize * 0.14,
+            -tileSize * 0.34,
+            tileSize * 0.14,
+            tileSize * 0.06,
+            -0.4,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+    }
+
+
+    /*
+       ORANGE
+    */
+
+    else if (
+        type === "orange"
+    ) {
+
+        ctx.shadowBlur = 25;
+
+        ctx.shadowColor =
+            "#ff8c00";
+
+        ctx.fillStyle =
+            "#ff8c00";
+
+
+        ctx.beginPath();
+
+        ctx.arc(
+            0,
+            0,
+            tileSize * 0.31,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+
+        ctx.shadowBlur = 0;
+
+        ctx.strokeStyle =
+            "#8b5a2b";
+
+        ctx.lineWidth = 2;
+
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            0,
+            -tileSize * 0.28
+        );
+
+        ctx.lineTo(
+            tileSize * 0.04,
+            -tileSize * 0.38
+        );
+
+        ctx.stroke();
+
+
+        ctx.fillStyle =
+            "#00dd55";
+
+
+        ctx.beginPath();
+
+        ctx.ellipse(
+            tileSize * 0.12,
+            -tileSize * 0.34,
+            tileSize * 0.13,
+            tileSize * 0.055,
+            -0.5,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+    }
+
+
+    /*
+       LEMON
+    */
+
+    else if (
+        type === "lemon"
+    ) {
+
+        ctx.shadowBlur = 25;
+
+        ctx.shadowColor =
+            "#ffe600";
+
+        ctx.fillStyle =
+            "#ffe600";
+
+
+        ctx.beginPath();
+
+        ctx.ellipse(
+            0,
+            0,
+            tileSize * 0.36,
+            tileSize * 0.24,
+            -0.25,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+
+        ctx.shadowBlur = 0;
+
+        ctx.strokeStyle =
+            "#d0a900";
+
+        ctx.lineWidth = 2;
+
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            -tileSize * 0.20,
+            tileSize * 0.05
+        );
+
+        ctx.lineTo(
+            tileSize * 0.20,
+            -tileSize * 0.05
+        );
+
+        ctx.stroke();
+    }
+
+
+    /*
+       STRAWBERRY
+    */
+
+    else if (
+        type === "strawberry"
+    ) {
+
+        ctx.shadowBlur = 25;
+
+        ctx.shadowColor =
+            "#ff1744";
+
+        ctx.fillStyle =
+            "#ff1744";
+
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            0,
+            tileSize * 0.32
+        );
+
+        ctx.bezierCurveTo(
+            -tileSize * 0.34,
+            tileSize * 0.02,
+            -tileSize * 0.28,
+            -tileSize * 0.24,
+            0,
+            -tileSize * 0.18
+        );
+
+        ctx.bezierCurveTo(
+            tileSize * 0.28,
+            -tileSize * 0.24,
+            tileSize * 0.34,
+            tileSize * 0.02,
+            0,
+            tileSize * 0.32
+        );
+
+        ctx.fill();
+
+
+        ctx.shadowBlur = 0;
+
+        ctx.fillStyle =
+            "#00dd55";
+
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            -tileSize * 0.20,
+            -tileSize * 0.18
+        );
+
+        ctx.lineTo(
+            0,
+            -tileSize * 0.35
+        );
+
+        ctx.lineTo(
+            tileSize * 0.20,
+            -tileSize * 0.18
+        );
+
+        ctx.lineTo(
+            0,
+            -tileSize * 0.12
+        );
+
+        ctx.closePath();
+
+        ctx.fill();
+
+
+        ctx.fillStyle =
+            "#ffe600";
+
+
+        for (
+            let i = 0;
+            i < 5;
+            i++
+        ) {
+
+            const sx =
+                (i - 2) *
+                tileSize * 0.10;
+
+            const sy =
+                tileSize *
+                (
+                    0.00 +
+                    Math.abs(i - 2) *
+                    0.04
+                );
+
+
+            ctx.beginPath();
+
+            ctx.ellipse(
+                sx,
+                sy,
+                tileSize * 0.025,
+                tileSize * 0.045,
+                0,
+                0,
+                Math.PI * 2
+            );
+
+            ctx.fill();
+        }
+    }
+
+
+    /*
+       GRAPE
+    */
+
+    else if (
+        type === "grape"
+    ) {
+
+        ctx.shadowBlur = 25;
+
+        ctx.shadowColor =
+            "#9b59ff";
+
+        ctx.fillStyle =
+            "#9b59ff";
+
+
+        const grapeSize =
+            tileSize * 0.11;
+
+
+        const grapes = [
+
+            [-0.14, -0.14],
+            [0.14, -0.14],
+
+            [-0.21, 0.02],
+            [0, 0.02],
+            [0.21, 0.02],
+
+            [-0.14, 0.18],
+            [0.14, 0.18],
+
+            [0, 0.32]
+
+        ];
+
+
+        grapes.forEach(
+            position => {
+
+                ctx.beginPath();
+
+                ctx.arc(
+                    position[0] *
+                    tileSize,
+
+                    position[1] *
+                    tileSize,
+
+                    grapeSize,
+
+                    0,
+                    Math.PI * 2
+                );
+
+                ctx.fill();
+            }
+        );
+
+
+        ctx.shadowBlur = 0;
+
+        ctx.strokeStyle =
+            "#8b5a2b";
+
+        ctx.lineWidth = 2;
+
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            0,
+            -tileSize * 0.18
+        );
+
+        ctx.lineTo(
+            tileSize * 0.06,
+            -tileSize * 0.36
+        );
+
+        ctx.stroke();
+
+
+        ctx.fillStyle =
+            "#00dd55";
+
+
+        ctx.beginPath();
+
+        ctx.ellipse(
+            tileSize * 0.13,
+            -tileSize * 0.31,
+            tileSize * 0.13,
+            tileSize * 0.06,
+            -0.5,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+    }
+
+
+    /*
+       WATERMELON
+    */
+
+    else if (
+        type === "watermelon"
+    ) {
+
+        ctx.shadowBlur = 25;
+
+        ctx.shadowColor =
+            "#00ff66";
+
+        ctx.fillStyle =
+            "#00dd55";
+
+
+        ctx.beginPath();
+
+        ctx.arc(
+            0,
+            0,
+            tileSize * 0.32,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+
+        ctx.fillStyle =
+            "#ff4d6d";
+
+
+        ctx.beginPath();
+
+        ctx.arc(
+            0,
+            0,
+            tileSize * 0.23,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+
+        ctx.fillStyle =
+            "#050505";
+
+
+        const seeds = [
+
+            [-0.10, -0.08],
+            [0.10, -0.08],
+            [-0.13, 0.10],
+            [0.13, 0.10],
+            [0, 0.18]
+
+        ];
+
+
+        seeds.forEach(
+            seed => {
+
+                ctx.beginPath();
+
+                ctx.ellipse(
+                    seed[0] *
+                    tileSize,
+
+                    seed[1] *
+                    tileSize,
+
+                    tileSize * 0.025,
+
+                    tileSize * 0.045,
+
+                    0,
+
+                    0,
+                    Math.PI * 2
+                );
+
+                ctx.fill();
+            }
+        );
+
+
+        ctx.strokeStyle =
+            "#00ff66";
+
+        ctx.lineWidth = 2;
+
+        ctx.beginPath();
+
+        ctx.arc(
+            0,
+            0,
+            tileSize * 0.32,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.stroke();
+    }
 
 
     ctx.restore();
@@ -1815,14 +3023,14 @@ function drawSnake() {
                 color =
                     index === 0
                         ? "#ffffff"
-                        : "#00ffff";
+                        : currentSnakeColor.main;
 
             } else {
 
                 color =
                     index === 0
-                        ? "#00ff66"
-                        : "#00cc55";
+                        ? currentSnakeColor.main
+                        : currentSnakeColor.body;
             }
 
 
@@ -2071,6 +3279,8 @@ function draw() {
 
     drawBackground();
 
+    drawObstacles();
+
     drawFood();
 
     drawSnake();
@@ -2101,6 +3311,32 @@ function draw() {
 
         redFlash *=
             0.90;
+    }
+
+
+    if (
+        obstacleFlash > 0
+    ) {
+
+        ctx.fillStyle =
+            `rgba(
+                255,
+                120,
+                0,
+                ${obstacleFlash * 0.18}
+            )`;
+
+
+        ctx.fillRect(
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+
+        obstacleFlash *=
+            0.88;
     }
 
 
@@ -2171,7 +3407,11 @@ function gameLoop(time) {
 
         foodParticles.length > 0 ||
 
-        redFlash > 0
+        obstacleParticles.length > 0 ||
+
+        redFlash > 0 ||
+
+        obstacleFlash > 0
 
     ) {
 
@@ -2331,8 +3571,20 @@ async function toggleFullscreen() {
             !document.fullscreenElement
         ) {
 
-            await document.documentElement
-                .requestFullscreen();
+            if (
+                document.documentElement
+                    .requestFullscreen
+            ) {
+
+                await document.documentElement
+                    .requestFullscreen();
+
+            } else {
+
+                document.body.classList.add(
+                    "mobileFullscreen"
+                );
+            }
 
         } else {
 
@@ -2342,13 +3594,16 @@ async function toggleFullscreen() {
     } catch (error) {
 
         /*
-           Fullscreen can be restricted
-           by some mobile browsers.
+           Fallback for mobile browsers
+           that restrict Fullscreen API.
         */
 
+        document.body.classList.toggle(
+            "mobileFullscreen"
+        );
     }
 
-    
+
     setTimeout(
         () => {
 
@@ -2423,4 +3678,3 @@ startGame();
 </body>
 
 </html>
-```
