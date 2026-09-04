@@ -507,11 +507,21 @@ canvas {
 
     top: 0;
 
+    left: 0;
+
     width: 100vw;
 
     height: 100vh;
 
     height: 100dvh;
+}
+
+
+:fullscreen canvas {
+
+    max-width: 100vw;
+
+    max-height: 100dvh;
 }
 
 
@@ -804,8 +814,7 @@ const ctx =
     canvas.getContext(
         "2d",
         {
-            alpha: false,
-            desynchronized: true
+            alpha: false
         }
     );
 
@@ -864,9 +873,9 @@ let lastTime = 0;
 let animationFrameId = null;
 
 
-/*
-   High FPS game timing
-*/
+/* =================================
+   HIGH FPS TIMING
+   ================================= */
 
 let accumulator = 0;
 
@@ -1191,7 +1200,7 @@ function resizeCanvas() {
         );
 
 
-    canvas.width =
+    const newSize =
         Math.max(
             GRID,
             Math.floor(
@@ -1200,8 +1209,17 @@ function resizeCanvas() {
         );
 
 
-    canvas.height =
-        canvas.width;
+    if (
+        canvas.width !== newSize ||
+        canvas.height !== newSize
+    ) {
+
+        canvas.width =
+            newSize;
+
+        canvas.height =
+            newSize;
+    }
 
 
     tileSize =
@@ -1248,6 +1266,7 @@ function startGame() {
             x: 13,
             y: 16
         }
+
     ];
 
 
@@ -1367,6 +1386,7 @@ function spawnFood() {
                     Math.random() *
                     (GRID - 4)
                 ) + 2
+
         };
 
 
@@ -1468,6 +1488,7 @@ function addObstacle() {
                     Math.random() *
                     (GRID - 4)
                 ) + 2
+
         };
 
 
@@ -1601,6 +1622,7 @@ function createObstacleAppearEffect(
 
             color:
                 "#ff8c00"
+
         });
     }
 }
@@ -1665,24 +1687,9 @@ function createObstacleExplosion(
                 Math.random() > 0.5
                     ? "#ff3030"
                     : "#ff9f00"
+
         });
     }
-}
-
-
-/* =================================
-   OBSTACLE COLLISION
-   ================================= */
-
-function checkObstacleCollision(
-    head
-) {
-
-    return obstacles.some(
-        obstacle =>
-            obstacle.x === head.x &&
-            obstacle.y === head.y
-    );
 }
 
 
@@ -1851,6 +1858,7 @@ function createEatEffect(
 
             color:
                 currentFruit.color
+
         });
     }
 
@@ -1917,6 +1925,7 @@ function createDeathExplosion() {
                     Math.random() * 7 + 2,
 
                 life: 1
+
             });
         }
     });
@@ -2117,6 +2126,7 @@ function update() {
         y:
             snake[0].y +
             direction.y
+
     };
 
 
@@ -2717,12 +2727,8 @@ function drawFood() {
                 tileSize * 0.10;
 
             const sy =
-                tileSize *
-                (
-                    0 +
-                    Math.abs(i - 2) *
-                    0.04
-                );
+                Math.abs(i - 2) *
+                tileSize * 0.04;
 
 
             ctx.beginPath();
@@ -3028,6 +3034,7 @@ function drawSnake() {
                 padding * 2,
 
                 tileSize * 0.18
+
             );
 
             ctx.fill();
@@ -3207,6 +3214,38 @@ function drawEyes() {
 
 function draw() {
 
+    /*
+       Clear the whole canvas BEFORE
+       applying screen shake.
+
+       This prevents old frames from
+       appearing around the edges.
+    */
+
+    ctx.save();
+
+    ctx.setTransform(
+        1,
+        0,
+        0,
+        1,
+        0,
+        0
+    );
+
+    ctx.fillStyle =
+        "#090909";
+
+    ctx.fillRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    ctx.restore();
+
+
     ctx.save();
 
 
@@ -3221,6 +3260,7 @@ function draw() {
 
             (Math.random() - 0.5) *
             screenShake
+
         );
 
 
@@ -3262,10 +3302,12 @@ function draw() {
 
 
         ctx.fillRect(
-            0,
-            0,
-            canvas.width,
-            canvas.height
+            -screenShake,
+            -screenShake,
+            canvas.width +
+            screenShake * 2,
+            canvas.height +
+            screenShake * 2
         );
 
 
@@ -3288,10 +3330,12 @@ function draw() {
 
 
         ctx.fillRect(
-            0,
-            0,
-            canvas.width,
-            canvas.height
+            -screenShake,
+            -screenShake,
+            canvas.width +
+            screenShake * 2,
+            canvas.height +
+            screenShake * 2
         );
 
 
@@ -3314,11 +3358,6 @@ function gameLoop(time) {
         time - lastTime;
 
 
-    /*
-       Prevent huge jumps after
-       the browser/tab was inactive.
-    */
-
     if (
         delta > MAX_FRAME_DELTA
     ) {
@@ -3337,8 +3376,8 @@ function gameLoop(time) {
 
 
     /*
-       Update particles every frame
-       for smooth animations.
+       Effects are rendered on every
+       available browser frame.
     */
 
     updateParticles();
@@ -3347,11 +3386,6 @@ function gameLoop(time) {
     if (
         eatColorEffect > 0
     ) {
-
-        /*
-           Frame-rate independent
-           visual fade.
-        */
 
         eatColorEffect *=
             Math.pow(
@@ -3379,9 +3413,9 @@ function gameLoop(time) {
 
 
     /*
-       Fixed game movement.
-       Rendering can run at 60/90/120/144+
-       FPS while snake speed stays the same.
+       Fixed movement timing.
+       Rendering itself runs at the
+       highest FPS available.
     */
 
     if (
@@ -3655,7 +3689,6 @@ document.addEventListener(
             document.body.classList.remove(
                 "mobileFullscreen"
             );
-
         }
 
 
