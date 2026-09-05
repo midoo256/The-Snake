@@ -44,39 +44,6 @@ body {
 }
 
 
-/* MOBILE RENDERING FIX */
-
-html,
-body,
-#navbar,
-#gameContainer,
-canvas,
-#gameOver,
-.gameOverBox,
-#feedbackText {
-
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
-
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-}
-
-#gameContainer {
-
-    contain: layout paint style;
-
-    isolation: isolate;
-
-    -webkit-overflow-scrolling: touch;
-}
-
-canvas {
-
-    contain: strict;
-}
-
-
 /* =================================
    NAVBAR
    ================================= */
@@ -338,6 +305,9 @@ canvas {
 
     max-width: 100%;
     max-height: 100%;
+
+    transform: translateZ(0);
+    backface-visibility: hidden;
 }
 
 
@@ -402,7 +372,6 @@ canvas {
     68% { opacity: 1; transform: translate(-50%, -62%) scale(1) rotate(0deg); }
     100% { opacity: 0; transform: translate(-50%, -82%) scale(0.9) rotate(0deg); }
 }
-
 
 /* =================================
    GAME OVER
@@ -890,8 +859,7 @@ const ctx =
     canvas.getContext(
         "2d",
         {
-            alpha: false,
-            desynchronized: true
+            alpha: false
         }
     );
 
@@ -1492,41 +1460,31 @@ highScoreElement.textContent =
    RESIZE
    ================================= */
 
-let resizeTimer = null;
-let lastCanvasSize = 0;
-
 function resizeCanvas() {
 
-    const isMobile =
+    let width =
+        window.innerWidth - 8;
+
+    let height =
+        window.innerHeight - 8;
+
+
+    if (
         window.matchMedia(
             "(max-width: 700px)"
-        ).matches;
+        ).matches
+    ) {
 
+        const navbarHeight =
+            document.fullscreenElement
+                ? 55
+                : 55;
 
-    const navbarHeight =
-        isMobile ? 55 : 64;
-
-
-    const viewportWidth =
-        window.visualViewport
-            ? window.visualViewport.width
-            : window.innerWidth;
-
-
-    const viewportHeight =
-        window.visualViewport
-            ? window.visualViewport.height
-            : window.innerHeight;
-
-
-    const width =
-        viewportWidth - 8;
-
-
-    const height =
-        viewportHeight -
-        navbarHeight -
-        8;
+        height =
+            window.innerHeight -
+            navbarHeight -
+            8;
+    }
 
 
     const size =
@@ -1544,67 +1502,21 @@ function resizeCanvas() {
             ) * GRID
         );
 
-
     if (
-        lastCanvasSize === newSize &&
         canvas.width === newSize &&
         canvas.height === newSize
     ) {
         return;
     }
 
-
-    lastCanvasSize =
-        newSize;
-
-
-    canvas.width =
-        newSize;
-
-    canvas.height =
-        newSize;
-
+    canvas.width = newSize;
+    canvas.height = newSize;
 
     tileSize =
         canvas.width / GRID;
 
-
     backgroundCache = null;
-
     backgroundCacheSize = 0;
-}
-
-
-function safeResize() {
-
-    if (resizeTimer) {
-
-        clearTimeout(
-            resizeTimer
-        );
-    }
-
-
-    resizeTimer =
-        setTimeout(
-            () => {
-
-                resizeTimer = null;
-
-                resizeCanvas();
-
-
-                if (
-                    snake &&
-                    food
-                ) {
-
-                    draw();
-                }
-
-            },
-            120
-        );
 }
 
 
@@ -1763,12 +1675,6 @@ function spawnFood() {
 
     while (!valid) {
 
-        /*
-           Keep food away from the
-           outer edge so its shape
-           can never be clipped.
-        */
-
         food = {
 
             x:
@@ -1804,12 +1710,6 @@ function spawnFood() {
         }
     }
 
-
-    /*
-       Make sure the next fruit
-       is different from the
-       previous one whenever possible.
-    */
 
     let nextFruit;
 
@@ -1864,7 +1764,6 @@ function addObstacle() {
     let valid = false;
 
     let newObstacle;
-
 
     let attempts = 0;
 
@@ -1924,11 +1823,6 @@ function addObstacle() {
                 );
         }
 
-
-        /*
-           Don't put an obstacle directly
-           beside the snake head.
-        */
 
         if (
             valid &&
@@ -2551,10 +2445,6 @@ function update() {
     };
 
 
-    /*
-       WALL
-    */
-
     if (
 
         head.x < 0 ||
@@ -2572,10 +2462,6 @@ function update() {
         return;
     }
 
-
-    /*
-       OBSTACLE
-    */
 
     const hitObstacle =
         obstacles.find(
@@ -2607,10 +2493,6 @@ function update() {
     }
 
 
-    /*
-       BODY
-    */
-
     const willEat =
         head.x === food.x &&
         head.y === food.y;
@@ -2640,10 +2522,6 @@ function update() {
     snake.unshift(head);
 
 
-    /*
-       APPLE / FRUIT
-    */
-
     if (willEat) {
 
         createEatEffect(
@@ -2660,11 +2538,6 @@ function update() {
         scoreElement.textContent =
             score;
 
-
-        /*
-           Change snake color
-           after every fruit.
-        */
 
         let newColor;
 
@@ -2716,11 +2589,6 @@ function update() {
                 115 - score * 3
             );
 
-
-        /*
-           Add an obstacle every
-           4 points.
-        */
 
         if (
             shouldAddObstacle()
@@ -4112,19 +3980,19 @@ document.addEventListener(
 
 window.addEventListener(
     "resize",
-    safeResize,
-    { passive: true }
+    () => {
+
+        resizeCanvas();
+
+        if (
+            snake &&
+            food
+        ) {
+
+            draw();
+        }
+    }
 );
-
-
-if (window.visualViewport) {
-
-    window.visualViewport.addEventListener(
-        "resize",
-        safeResize,
-        { passive: true }
-    );
-}
 
 
 document.addEventListener(
