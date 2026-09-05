@@ -368,7 +368,6 @@ canvas {
     100% { opacity: 0; transform: translate(-50%, -82%) scale(0.9) rotate(0deg); }
 }
 
-
 /* =================================
    GAME OVER
    ================================= */
@@ -785,12 +784,9 @@ canvas {
 
 
     <!-- FEEDBACK TEXT -->
-
     <div id="feedbackText"></div>
 
-
     <!-- GAME CANVAS -->
-
     <canvas id="game"></canvas>
 
 
@@ -920,45 +916,16 @@ let gameSpeed = 115;
 
 let lastTime = 0;
 
-let gameAccumulator = 0;
-
-
-/* =================================
-   PERFORMANCE
-   ================================= */
-
-const isMobileDevice =
-    /Android|iPhone|iPad|iPod|Mobile/i.test(
-        navigator.userAgent
-    );
-
-const maxParticles =
-    isMobileDevice ? 70 : 140;
-
-const maxFoodParticles =
-    isMobileDevice ? 24 : 50;
-
-const maxObstacleParticles =
-    isMobileDevice ? 32 : 70;
-
-let lastParticleTime = 0;
-
 let animationFrameId = null;
-
-
-/* =================================
-   AUDIO
-   ================================= */
 
 let audioContext = null;
 let audioMaster = null;
 let feedbackTimer = null;
-
+let gameOverTimeout = null;
+let frameScale = 1;
 
 function initAudio() {
-
     if (!audioContext) {
-
         const AudioCtx =
             window.AudioContext ||
             window.webkitAudioContext;
@@ -966,30 +933,23 @@ function initAudio() {
         if (!AudioCtx)
             return;
 
-        audioContext =
-            new AudioCtx();
-
+        audioContext = new AudioCtx();
         audioMaster =
             audioContext.createGain();
 
-        audioMaster.gain.value =
-            0.16;
-
+        audioMaster.gain.value = 0.16;
         audioMaster.connect(
             audioContext.destination
         );
     }
 
-
     if (
         audioContext &&
         audioContext.state === "suspended"
     ) {
-
         audioContext.resume();
     }
 }
-
 
 function tone(
     frequency,
@@ -998,19 +958,13 @@ function tone(
     volume = 0.08,
     slideTo = null
 ) {
-
     initAudio();
 
-    if (
-        !audioContext ||
-        !audioMaster
-    )
+    if (!audioContext || !audioMaster)
         return;
-
 
     const now =
         audioContext.currentTime;
-
 
     const oscillator =
         audioContext.createOscillator();
@@ -1018,63 +972,48 @@ function tone(
     const gain =
         audioContext.createGain();
 
-
     oscillator.type = type;
-
-
     oscillator.frequency.setValueAtTime(
         frequency,
         now
     );
 
-
     if (slideTo !== null) {
-
-        oscillator.frequency
-            .exponentialRampToValueAtTime(
-                Math.max(25, slideTo),
-                now + duration
-            );
+        oscillator.frequency.exponentialRampToValueAtTime(
+            Math.max(25, slideTo),
+            now + duration
+        );
     }
-
 
     gain.gain.setValueAtTime(
         0.0001,
         now
     );
 
-
     gain.gain.exponentialRampToValueAtTime(
         volume,
         now + 0.008
     );
-
 
     gain.gain.exponentialRampToValueAtTime(
         0.0001,
         now + duration
     );
 
-
     oscillator.connect(gain);
     gain.connect(audioMaster);
 
-
     oscillator.start(now);
-
     oscillator.stop(
         now + duration + 0.015
     );
 }
 
-
 function playExplosionSound() {
-
     initAudio();
 
     if (!audioContext)
         return;
-
 
     tone(
         110,
@@ -1083,7 +1022,6 @@ function playExplosionSound() {
         0.20,
         38
     );
-
 
     tone(
         65,
@@ -1094,73 +1032,46 @@ function playExplosionSound() {
     );
 }
 
-
 function playLoseSound() {
-
     initAudio();
 
-
-    if (
-        !audioContext ||
-        !audioMaster
-    )
+    if (!audioContext)
         return;
 
+    tone(
+        420,
+        0.13,
+        "square",
+        0.075,
+        250
+    );
 
-    const notes = [
+    setTimeout(
+        () =>
+            tone(
+                250,
+                0.18,
+                "square",
+                0.08,
+                95
+            ),
+        105
+    );
 
-        {
-            frequency: 392,
-            duration: 0.12,
-            delay: 0
-        },
-
-        {
-            frequency: 330,
-            duration: 0.12,
-            delay: 0.12
-        },
-
-        {
-            frequency: 262,
-            duration: 0.16,
-            delay: 0.24
-        },
-
-        {
-            frequency: 196,
-            duration: 0.28,
-            delay: 0.40
-        }
-
-    ];
-
-
-    notes.forEach(
-        note => {
-
-            setTimeout(
-                () => {
-
-                    tone(
-                        note.frequency,
-                        note.duration,
-                        "square",
-                        0.09,
-                        note.frequency * 0.92
-                    );
-
-                },
-                note.delay * 1000
-            );
-
-        }
+    setTimeout(
+        () =>
+            tone(
+                115,
+                0.30,
+                "sawtooth",
+                0.07,
+                55
+            ),
+        220
     );
 }
 
-
 const eatSoundPatterns = [
-
     [660, 880],
     [523, 784],
     [740, 988],
@@ -1169,24 +1080,18 @@ const eatSoundPatterns = [
     [494, 740],
     [622, 932],
     [784, 1175]
-
 ];
-
 
 let eatSoundIndex = 0;
 
-
 function playEatSound() {
-
     const pattern =
         eatSoundPatterns[
             eatSoundIndex %
             eatSoundPatterns.length
         ];
 
-
     eatSoundIndex++;
-
 
     tone(
         pattern[0],
@@ -1195,7 +1100,6 @@ function playEatSound() {
         0.055,
         pattern[1]
     );
-
 
     setTimeout(
         () =>
@@ -1209,9 +1113,7 @@ function playEatSound() {
     );
 }
 
-
 const feedbackWords = [
-
     "AMAZING!",
     "AWESOME!",
     "NICE!",
@@ -1220,58 +1122,36 @@ const feedbackWords = [
     "DELICIOUS!",
     "WOW!",
     "PERFECT!"
-
 ];
-
 
 let feedbackIndex = 0;
 
-
 function showFeedback() {
-
     const word =
         feedbackWords[
             feedbackIndex %
             feedbackWords.length
         ];
 
-
     feedbackIndex++;
 
-
-    feedbackText.textContent =
-        word;
-
-
+    feedbackText.textContent = word;
     feedbackText.style.color =
         currentFruit.color;
 
-
-    feedbackText.classList.remove(
-        "show"
-    );
-
+    feedbackText.classList.remove("show");
 
     void feedbackText.offsetWidth;
 
-
-    feedbackText.classList.add(
-        "show"
-    );
-
+    feedbackText.classList.add("show");
 
     if (feedbackTimer)
         clearTimeout(feedbackTimer);
 
-
     feedbackTimer =
         setTimeout(
             () => {
-
-                feedbackText.classList.remove(
-                    "show"
-                );
-
+                feedbackText.classList.remove("show");
             },
             760
         );
@@ -1401,7 +1281,6 @@ document.addEventListener(
     { passive: true }
 );
 
-
 document.addEventListener(
     "keydown",
     initAudio,
@@ -1414,6 +1293,7 @@ document.addEventListener(
    ================================= */
 
 let touchStartX = 0;
+
 let touchStartY = 0;
 
 
@@ -1433,7 +1313,6 @@ document.addEventListener(
 
         touchStartY =
             event.touches[0].clientY;
-
     },
     {
         passive: true
@@ -1460,14 +1339,12 @@ document.addEventListener(
             touch.clientX -
             touchStartX;
 
-
         const deltaY =
             touch.clientY -
             touchStartY;
 
 
-        const minSwipeDistance =
-            25;
+        const minSwipeDistance = 25;
 
 
         if (
@@ -1521,7 +1398,6 @@ document.addEventListener(
                 );
             }
         }
-
     },
     {
         passive: true
@@ -1569,7 +1445,6 @@ function resizeCanvas() {
     let width =
         window.innerWidth - 8;
 
-
     let height =
         window.innerHeight - 8;
 
@@ -1585,7 +1460,6 @@ function resizeCanvas() {
                 ? 55
                 : 55;
 
-
         height =
             window.innerHeight -
             navbarHeight -
@@ -1600,7 +1474,7 @@ function resizeCanvas() {
         );
 
 
-    const newSize =
+    canvas.width =
         Math.max(
             GRID,
             Math.floor(
@@ -1609,34 +1483,15 @@ function resizeCanvas() {
         );
 
 
-    /*
-       Avoid resetting the canvas when
-       its size has not actually changed.
-       This prevents unnecessary GPU work.
-    */
+    canvas.height =
+        canvas.width;
 
-    if (
-        canvas.width !== newSize ||
-        canvas.height !== newSize
-    ) {
 
-        canvas.width =
-            newSize;
+    tileSize =
+        canvas.width / GRID;
 
-        canvas.height =
-            newSize;
-
-        tileSize =
-            newSize / GRID;
-
-        backgroundCache = null;
-        backgroundCacheSize = 0;
-
-    } else {
-
-        tileSize =
-            canvas.width / GRID;
-    }
+    backgroundCache = null;
+    backgroundCacheSize = 0;
 }
 
 
@@ -1645,6 +1500,16 @@ function resizeCanvas() {
    ================================= */
 
 function startGame() {
+
+    if (gameOverTimeout) {
+        clearTimeout(gameOverTimeout);
+        gameOverTimeout = null;
+    }
+
+    if (feedbackTimer) {
+        clearTimeout(feedbackTimer);
+        feedbackTimer = null;
+    }
 
     if (
         animationFrameId !== null
@@ -1679,7 +1544,6 @@ function startGame() {
             x: 13,
             y: 16
         }
-
     ];
 
 
@@ -1701,30 +1565,17 @@ function startGame() {
 
     gameRunning = true;
 
-
-    const now =
+    lastTime =
         performance.now();
 
 
-    lastTime =
-        now;
+    particles = [];
 
+    foodParticles = [];
 
-    lastParticleTime =
-        now;
+    obstacleParticles = [];
 
-
-    gameAccumulator = 0;
-
-
-    particles.length = 0;
-
-    foodParticles.length = 0;
-
-    obstacleParticles.length = 0;
-
-    obstacles.length = 0;
-
+    obstacles = [];
 
     obstacleCount = 0;
 
@@ -1744,11 +1595,7 @@ function startGame() {
 
     gameOverReady = false;
 
-
-    feedbackText.classList.remove(
-        "show"
-    );
-
+    feedbackText.classList.remove("show");
     feedbackText.textContent = "";
 
 
@@ -1804,6 +1651,12 @@ function spawnFood() {
 
     while (!valid) {
 
+        /*
+           Keep food away from the
+           outer edge so its shape
+           can never be clipped.
+        */
+
         food = {
 
             x:
@@ -1840,8 +1693,13 @@ function spawnFood() {
     }
 
 
-    let nextFruit;
+    /*
+       Make sure the next fruit
+       is different from the
+       previous one whenever possible.
+    */
 
+    let nextFruit;
 
     do {
 
@@ -1894,6 +1752,7 @@ function addObstacle() {
     let valid = false;
 
     let newObstacle;
+
 
     let attempts = 0;
 
@@ -1954,6 +1813,11 @@ function addObstacle() {
         }
 
 
+        /*
+           Don't put an obstacle directly
+           beside the snake head.
+        */
+
         if (
             valid &&
             snake[0]
@@ -2012,7 +1876,6 @@ function createObstacleAppearEffect(
         x * tileSize +
         tileSize / 2;
 
-
     const centerY =
         y * tileSize +
         tileSize / 2;
@@ -2027,7 +1890,6 @@ function createObstacleAppearEffect(
         const angle =
             Math.random() *
             Math.PI * 2;
-
 
         const speed =
             Math.random() * 3 + 1;
@@ -2071,7 +1933,6 @@ function createObstacleExplosion(
         obstacle.x * tileSize +
         tileSize / 2;
 
-
     const centerY =
         obstacle.y * tileSize +
         tileSize / 2;
@@ -2080,7 +1941,6 @@ function createObstacleExplosion(
     screenShake = 16;
 
     obstacleFlash = 1;
-
 
     playExplosionSound();
 
@@ -2094,7 +1954,6 @@ function createObstacleExplosion(
         const angle =
             Math.random() *
             Math.PI * 2;
-
 
         const speed =
             Math.random() * 8 + 2;
@@ -2165,7 +2024,6 @@ function drawObstacles() {
                 tileSize +
                 tileSize / 2;
 
-
             const y =
                 obstacle.y *
                 tileSize +
@@ -2209,7 +2067,6 @@ function drawObstacles() {
 
             ctx.beginPath();
 
-
             ctx.roundRect(
                 -size / 2,
                 -size / 2,
@@ -2217,7 +2074,6 @@ function drawObstacles() {
                 size,
                 tileSize * 0.10
             );
-
 
             ctx.fill();
 
@@ -2230,30 +2086,25 @@ function drawObstacles() {
             ctx.strokeStyle =
                 "#ff9f00";
 
-
             ctx.lineWidth = 2;
 
 
             ctx.beginPath();
-
 
             ctx.moveTo(
                 -size * 0.28,
                 -size * 0.10
             );
 
-
             ctx.lineTo(
                 size * 0.05,
                 size * 0.22
             );
 
-
             ctx.lineTo(
                 size * 0.27,
                 -size * 0.25
             );
-
 
             ctx.stroke();
 
@@ -2277,7 +2128,6 @@ function createEatEffect(
         x * tileSize +
         tileSize / 2;
 
-
     const centerY =
         y * tileSize +
         tileSize / 2;
@@ -2292,7 +2142,6 @@ function createEatEffect(
         const angle =
             Math.random() *
             Math.PI * 2;
-
 
         const speed =
             Math.random() * 5 + 2;
@@ -2342,56 +2191,52 @@ function createDeathExplosion() {
     redFlash = 1;
 
 
-    snake.forEach(
-        part => {
+    snake.forEach(part => {
 
-            const x =
-                part.x * tileSize +
-                tileSize / 2;
+        const x =
+            part.x * tileSize +
+            tileSize / 2;
 
-
-            const y =
-                part.y * tileSize +
-                tileSize / 2;
+        const y =
+            part.y * tileSize +
+            tileSize / 2;
 
 
-            for (
-                let i = 0;
-                i < 8;
-                i++
-            ) {
+        for (
+            let i = 0;
+            i < 8;
+            i++
+        ) {
 
-                const angle =
-                    Math.random() *
-                    Math.PI * 2;
+            const angle =
+                Math.random() *
+                Math.PI * 2;
+
+            const speed =
+                Math.random() * 7 + 2;
 
 
-                const speed =
-                    Math.random() * 7 + 2;
+            particles.push({
 
+                x: x,
 
-                particles.push({
+                y: y,
 
-                    x: x,
+                vx:
+                    Math.cos(angle) *
+                    speed,
 
-                    y: y,
+                vy:
+                    Math.sin(angle) *
+                    speed,
 
-                    vx:
-                        Math.cos(angle) *
-                        speed,
+                size:
+                    Math.random() * 7 + 2,
 
-                    vy:
-                        Math.sin(angle) *
-                        speed,
-
-                    size:
-                        Math.random() * 7 + 2,
-
-                    life: 1
-                });
-            }
+                life: 1
+            });
         }
-    );
+    });
 }
 
 
@@ -2399,213 +2244,76 @@ function createDeathExplosion() {
    UPDATE PARTICLES
    ================================= */
 
-function updateParticles(
-    deltaTime
-) {
+function updateParticles() {
 
-    /*
-       Convert milliseconds into a
-       60 FPS normalized multiplier.
+    particles.forEach(p => {
 
-       This avoids calling performance.now()
-       separately every frame.
-    */
+        p.x += p.vx;
 
-    const dt =
-        Math.min(
-            deltaTime / 16.6667,
-            2
+        p.y += p.vy;
+
+        p.vx *= 0.97;
+
+        p.vy *= 0.97;
+
+        p.vy += 0.08;
+
+        p.life -= 0.025;
+
+        p.size *= 0.985;
+    });
+
+
+    particles =
+        particles.filter(
+            p => p.life > 0
         );
 
 
-    /*
-       Hard particle limits.
-    */
+    foodParticles.forEach(p => {
 
-    if (
-        particles.length >
-        maxParticles
-    ) {
+        p.x += p.vx;
 
-        particles.length =
-            maxParticles;
-    }
+        p.y += p.vy;
 
+        p.vx *= 0.96;
 
-    if (
-        foodParticles.length >
-        maxFoodParticles
-    ) {
+        p.vy *= 0.96;
 
-        foodParticles.length =
-            maxFoodParticles;
-    }
+        p.life -= 0.035;
 
+        p.size *= 0.97;
+    });
 
-    if (
-        obstacleParticles.length >
-        maxObstacleParticles
-    ) {
 
-        obstacleParticles.length =
-            maxObstacleParticles;
-    }
+    foodParticles =
+        foodParticles.filter(
+            p => p.life > 0
+        );
 
 
-    /*
-       Normal particles
-    */
+    obstacleParticles.forEach(p => {
 
-    for (
-        let i = particles.length - 1;
-        i >= 0;
-        i--
-    ) {
+        p.x += p.vx;
 
-        const p =
-            particles[i];
+        p.y += p.vy;
 
+        p.vx *= 0.97;
 
-        p.x +=
-            p.vx * dt;
+        p.vy *= 0.97;
 
+        p.vy += 0.06;
 
-        p.y +=
-            p.vy * dt;
+        p.life -= 0.025;
 
+        p.size *= 0.975;
+    });
 
-        const drag =
-            Math.pow(
-                0.96,
-                dt
-            );
 
-
-        p.vx *= drag;
-
-        p.vy *= drag;
-
-
-        p.life -=
-            0.035 * dt;
-
-
-        if (
-            p.life <= 0
-        ) {
-
-            particles[i] =
-                particles[
-                    particles.length - 1
-                ];
-
-            particles.pop();
-        }
-    }
-
-
-    /*
-       Food particles
-    */
-
-    for (
-        let i = foodParticles.length - 1;
-        i >= 0;
-        i--
-    ) {
-
-        const p =
-            foodParticles[i];
-
-
-        p.x +=
-            p.vx * dt;
-
-
-        p.y +=
-            p.vy * dt;
-
-
-        const drag =
-            Math.pow(
-                0.94,
-                dt
-            );
-
-
-        p.vx *= drag;
-
-        p.vy *= drag;
-
-
-        p.life -=
-            0.045 * dt;
-
-
-        if (
-            p.life <= 0
-        ) {
-
-            foodParticles[i] =
-                foodParticles[
-                    foodParticles.length - 1
-                ];
-
-            foodParticles.pop();
-        }
-    }
-
-
-    /*
-       Obstacle particles
-    */
-
-    for (
-        let i = obstacleParticles.length - 1;
-        i >= 0;
-        i--
-    ) {
-
-        const p =
-            obstacleParticles[i];
-
-
-        p.x +=
-            p.vx * dt;
-
-
-        p.y +=
-            p.vy * dt;
-
-
-        const drag =
-            Math.pow(
-                0.93,
-                dt
-            );
-
-
-        p.vx *= drag;
-
-        p.vy *= drag;
-
-
-        p.life -=
-            0.04 * dt;
-
-
-        if (
-            p.life <= 0
-        ) {
-
-            obstacleParticles[i] =
-                obstacleParticles[
-                    obstacleParticles.length - 1
-                ];
-
-            obstacleParticles.pop();
-        }
-    }
+    obstacleParticles =
+        obstacleParticles.filter(
+            p => p.life > 0
+        );
 }
 
 
@@ -2615,111 +2323,90 @@ function updateParticles(
 
 function drawParticles() {
 
-    particles.forEach(
-        p => {
+    particles.forEach(p => {
 
-            ctx.globalAlpha =
-                p.life;
+        ctx.globalAlpha =
+            p.life;
 
+        ctx.fillStyle =
+            currentSnakeColor.main;
 
-            ctx.fillStyle =
-                currentSnakeColor.main;
+        ctx.shadowBlur = 15;
 
-
-            ctx.shadowBlur = 15;
-
-
-            ctx.shadowColor =
-                currentSnakeColor.main;
+        ctx.shadowColor =
+            currentSnakeColor.main;
 
 
-            ctx.beginPath();
+        ctx.beginPath();
+
+        ctx.arc(
+            p.x,
+            p.y,
+            p.size,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+    });
 
 
-            ctx.arc(
-                p.x,
-                p.y,
-                p.size,
-                0,
-                Math.PI * 2
-            );
+    foodParticles.forEach(p => {
+
+        ctx.globalAlpha =
+            p.life;
+
+        ctx.fillStyle =
+            p.color ||
+            currentFruit.color;
+
+        ctx.shadowBlur = 15;
+
+        ctx.shadowColor =
+            p.color ||
+            currentFruit.glow;
 
 
-            ctx.fill();
-        }
-    );
+        ctx.beginPath();
+
+        ctx.arc(
+            p.x,
+            p.y,
+            p.size,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+    });
 
 
-    foodParticles.forEach(
-        p => {
+    obstacleParticles.forEach(p => {
 
-            ctx.globalAlpha =
-                p.life;
+        ctx.globalAlpha =
+            p.life;
 
+        ctx.fillStyle =
+            p.color;
 
-            ctx.fillStyle =
-                p.color ||
-                currentFruit.color;
+        ctx.shadowBlur = 18;
 
-
-            ctx.shadowBlur = 15;
-
-
-            ctx.shadowColor =
-                p.color ||
-                currentFruit.glow;
+        ctx.shadowColor =
+            p.color;
 
 
-            ctx.beginPath();
+        ctx.beginPath();
 
+        ctx.arc(
+            p.x,
+            p.y,
+            p.size,
+            0,
+            Math.PI * 2
+        );
 
-            ctx.arc(
-                p.x,
-                p.y,
-                p.size,
-                0,
-                Math.PI * 2
-            );
-
-
-            ctx.fill();
-        }
-    );
-
-
-    obstacleParticles.forEach(
-        p => {
-
-            ctx.globalAlpha =
-                p.life;
-
-
-            ctx.fillStyle =
-                p.color;
-
-
-            ctx.shadowBlur = 18;
-
-
-            ctx.shadowColor =
-                p.color;
-
-
-            ctx.beginPath();
-
-
-            ctx.arc(
-                p.x,
-                p.y,
-                p.size,
-                0,
-                Math.PI * 2
-            );
-
-
-            ctx.fill();
-        }
-    );
+        ctx.fill();
+    });
 
 
     ctx.globalAlpha = 1;
@@ -2810,19 +2497,29 @@ function update() {
        BODY
     */
 
-    if (
+    const willEat =
+        head.x === food.x &&
+        head.y === food.y;
 
-        snake.some(
-            part =>
-                part.x === head.x &&
-                part.y === head.y
-        )
+    const bodyLimit =
+        willEat
+            ? snake.length
+            : snake.length - 1;
 
+    for (
+        let i = 0;
+        i < bodyLimit;
+        i++
     ) {
+        const part = snake[i];
 
-        die("self");
-
-        return;
+        if (
+            part.x === head.x &&
+            part.y === head.y
+        ) {
+            die("self");
+            return;
+        }
     }
 
 
@@ -2830,37 +2527,32 @@ function update() {
 
 
     /*
-       FRUIT
+       APPLE / FRUIT
     */
 
-    if (
-
-        head.x === food.x &&
-
-        head.y === food.y
-
-    ) {
+    if (willEat) {
 
         createEatEffect(
             food.x,
             food.y
         );
 
-
         playEatSound();
-
         showFeedback();
 
 
         score++;
 
-
         scoreElement.textContent =
             score;
 
 
-        let newColor;
+        /*
+           Change snake color
+           after every fruit.
+        */
 
+        let newColor;
 
         do {
 
@@ -2875,7 +2567,6 @@ function update() {
         } while (
 
             snakeColors.length > 1 &&
-
             newColor.main ===
             currentSnakeColor.main
 
@@ -2912,6 +2603,11 @@ function update() {
             );
 
 
+        /*
+           Add an obstacle every
+           4 points.
+        */
+
         if (
             shouldAddObstacle()
         ) {
@@ -2933,23 +2629,15 @@ function update() {
    DIE
    ================================= */
 
-function die(
-    reason = "self"
-) {
+function die(reason = "self") {
 
-    if (
-        deathAnimation
-    )
+    if (deathAnimation)
         return;
 
 
     gameRunning = false;
 
-
-    if (
-        reason !== "bomb"
-    ) {
-
+    if (reason !== "bomb") {
         playLoseSound();
     }
 
@@ -2957,19 +2645,25 @@ function die(
     createDeathExplosion();
 
 
-    setTimeout(
+    if (gameOverTimeout) {
+        clearTimeout(gameOverTimeout);
+    }
+
+    gameOverTimeout = setTimeout(
         () => {
+            gameOverTimeout = null;
+
+            if (gameRunning) {
+                return;
+            }
 
             finalScore.textContent =
                 score;
 
-
             gameOverReady = true;
-
 
             gameOver.style.display =
                 "flex";
-
         },
         750
     );
@@ -2983,37 +2677,23 @@ function die(
 function drawBackground() {
 
     if (
-
         !backgroundCache ||
-
-        backgroundCacheSize !==
-        canvas.width
-
+        backgroundCacheSize !== canvas.width
     ) {
-
         backgroundCache =
-            document.createElement(
-                "canvas"
-            );
-
+            document.createElement("canvas");
 
         backgroundCache.width =
             canvas.width;
 
-
         backgroundCache.height =
             canvas.height;
 
-
         const bgCtx =
-            backgroundCache.getContext(
-                "2d"
-            );
-
+            backgroundCache.getContext("2d");
 
         bgCtx.fillStyle =
             "#090909";
-
 
         bgCtx.fillRect(
             0,
@@ -3022,61 +2702,48 @@ function drawBackground() {
             backgroundCache.height
         );
 
-
         bgCtx.strokeStyle =
             "#111";
 
-
         bgCtx.lineWidth = 1;
-
 
         for (
             let i = 0;
             i <= GRID;
             i++
         ) {
-
             bgCtx.beginPath();
-
 
             bgCtx.moveTo(
                 i * tileSize,
                 0
             );
 
-
             bgCtx.lineTo(
                 i * tileSize,
                 backgroundCache.height
             );
 
-
             bgCtx.stroke();
 
-
             bgCtx.beginPath();
-
 
             bgCtx.moveTo(
                 0,
                 i * tileSize
             );
 
-
             bgCtx.lineTo(
                 backgroundCache.width,
                 i * tileSize
             );
 
-
             bgCtx.stroke();
         }
-
 
         backgroundCacheSize =
             canvas.width;
     }
-
 
     ctx.drawImage(
         backgroundCache,
@@ -3085,20 +2752,15 @@ function drawBackground() {
     );
 }
 
-
 /* =================================
    DRAW FOOD
    ================================= */
 
 function drawFood() {
 
-    if (
-        deathAnimation
-    )
+    if (deathAnimation)
         return;
 
-
-    foodPulse += 0.08;
 
 
     const pulse =
@@ -3110,7 +2772,6 @@ function drawFood() {
     const x =
         food.x * tileSize +
         tileSize / 2;
-
 
     const y =
         food.y * tileSize +
@@ -3136,6 +2797,10 @@ function drawFood() {
         currentFruit.type;
 
 
+    /*
+       APPLE
+    */
+
     if (
         type === "apple"
     ) {
@@ -3151,7 +2816,6 @@ function drawFood() {
 
         ctx.beginPath();
 
-
         ctx.arc(
             -tileSize * 0.08,
             0,
@@ -3159,7 +2823,6 @@ function drawFood() {
             0,
             Math.PI * 2
         );
-
 
         ctx.arc(
             tileSize * 0.08,
@@ -3169,12 +2832,10 @@ function drawFood() {
             Math.PI * 2
         );
 
-
         ctx.fill();
 
 
         ctx.beginPath();
-
 
         ctx.arc(
             0,
@@ -3184,34 +2845,28 @@ function drawFood() {
             Math.PI * 2
         );
 
-
         ctx.fill();
 
 
         ctx.shadowBlur = 0;
 
-
         ctx.strokeStyle =
             "#8b5a2b";
-
 
         ctx.lineWidth = 3;
 
 
         ctx.beginPath();
 
-
         ctx.moveTo(
             0,
             -tileSize * 0.22
         );
 
-
         ctx.lineTo(
             tileSize * 0.05,
             -tileSize * 0.38
         );
-
 
         ctx.stroke();
 
@@ -3221,7 +2876,6 @@ function drawFood() {
 
 
         ctx.beginPath();
-
 
         ctx.ellipse(
             tileSize * 0.14,
@@ -3233,11 +2887,13 @@ function drawFood() {
             Math.PI * 2
         );
 
-
         ctx.fill();
-
     }
 
+
+    /*
+       ORANGE
+    */
 
     else if (
         type === "orange"
@@ -3254,7 +2910,6 @@ function drawFood() {
 
         ctx.beginPath();
 
-
         ctx.arc(
             0,
             0,
@@ -3263,34 +2918,28 @@ function drawFood() {
             Math.PI * 2
         );
 
-
         ctx.fill();
 
 
         ctx.shadowBlur = 0;
 
-
         ctx.strokeStyle =
             "#8b5a2b";
-
 
         ctx.lineWidth = 2;
 
 
         ctx.beginPath();
 
-
         ctx.moveTo(
             0,
             -tileSize * 0.28
         );
 
-
         ctx.lineTo(
             tileSize * 0.04,
             -tileSize * 0.38
         );
-
 
         ctx.stroke();
 
@@ -3300,7 +2949,6 @@ function drawFood() {
 
 
         ctx.beginPath();
-
 
         ctx.ellipse(
             tileSize * 0.12,
@@ -3312,11 +2960,13 @@ function drawFood() {
             Math.PI * 2
         );
 
-
         ctx.fill();
-
     }
 
+
+    /*
+       LEMON
+    */
 
     else if (
         type === "lemon"
@@ -3333,7 +2983,6 @@ function drawFood() {
 
         ctx.beginPath();
 
-
         ctx.ellipse(
             0,
             0,
@@ -3344,39 +2993,36 @@ function drawFood() {
             Math.PI * 2
         );
 
-
         ctx.fill();
 
 
         ctx.shadowBlur = 0;
 
-
         ctx.strokeStyle =
             "#d0a900";
-
 
         ctx.lineWidth = 2;
 
 
         ctx.beginPath();
 
-
         ctx.moveTo(
             -tileSize * 0.20,
             tileSize * 0.05
         );
-
 
         ctx.lineTo(
             tileSize * 0.20,
             -tileSize * 0.05
         );
 
-
         ctx.stroke();
-
     }
 
+
+    /*
+       STRAWBERRY
+    */
 
     else if (
         type === "strawberry"
@@ -3393,12 +3039,10 @@ function drawFood() {
 
         ctx.beginPath();
 
-
         ctx.moveTo(
             0,
             tileSize * 0.32
         );
-
 
         ctx.bezierCurveTo(
             -tileSize * 0.34,
@@ -3409,7 +3053,6 @@ function drawFood() {
             -tileSize * 0.18
         );
 
-
         ctx.bezierCurveTo(
             tileSize * 0.28,
             -tileSize * 0.24,
@@ -3419,12 +3062,10 @@ function drawFood() {
             tileSize * 0.32
         );
 
-
         ctx.fill();
 
 
         ctx.shadowBlur = 0;
-
 
         ctx.fillStyle =
             "#00dd55";
@@ -3432,33 +3073,27 @@ function drawFood() {
 
         ctx.beginPath();
 
-
         ctx.moveTo(
             -tileSize * 0.20,
             -tileSize * 0.18
         );
-
 
         ctx.lineTo(
             0,
             -tileSize * 0.35
         );
 
-
         ctx.lineTo(
             tileSize * 0.20,
             -tileSize * 0.18
         );
-
 
         ctx.lineTo(
             0,
             -tileSize * 0.12
         );
 
-
         ctx.closePath();
-
 
         ctx.fill();
 
@@ -3477,7 +3112,6 @@ function drawFood() {
                 (i - 2) *
                 tileSize * 0.10;
 
-
             const sy =
                 tileSize *
                 (
@@ -3489,7 +3123,6 @@ function drawFood() {
 
             ctx.beginPath();
 
-
             ctx.ellipse(
                 sx,
                 sy,
@@ -3500,12 +3133,14 @@ function drawFood() {
                 Math.PI * 2
             );
 
-
             ctx.fill();
         }
-
     }
 
+
+    /*
+       GRAPE
+    */
 
     else if (
         type === "grape"
@@ -3546,7 +3181,6 @@ function drawFood() {
 
                 ctx.beginPath();
 
-
                 ctx.arc(
                     position[0] *
                     tileSize,
@@ -3560,7 +3194,6 @@ function drawFood() {
                     Math.PI * 2
                 );
 
-
                 ctx.fill();
             }
         );
@@ -3568,28 +3201,23 @@ function drawFood() {
 
         ctx.shadowBlur = 0;
 
-
         ctx.strokeStyle =
             "#8b5a2b";
-
 
         ctx.lineWidth = 2;
 
 
         ctx.beginPath();
 
-
         ctx.moveTo(
             0,
             -tileSize * 0.18
         );
 
-
         ctx.lineTo(
             tileSize * 0.06,
             -tileSize * 0.36
         );
-
 
         ctx.stroke();
 
@@ -3599,7 +3227,6 @@ function drawFood() {
 
 
         ctx.beginPath();
-
 
         ctx.ellipse(
             tileSize * 0.13,
@@ -3611,11 +3238,13 @@ function drawFood() {
             Math.PI * 2
         );
 
-
         ctx.fill();
-
     }
 
+
+    /*
+       WATERMELON
+    */
 
     else if (
         type === "watermelon"
@@ -3632,7 +3261,6 @@ function drawFood() {
 
         ctx.beginPath();
 
-
         ctx.arc(
             0,
             0,
@@ -3640,7 +3268,6 @@ function drawFood() {
             0,
             Math.PI * 2
         );
-
 
         ctx.fill();
 
@@ -3651,7 +3278,6 @@ function drawFood() {
 
         ctx.beginPath();
 
-
         ctx.arc(
             0,
             0,
@@ -3659,7 +3285,6 @@ function drawFood() {
             0,
             Math.PI * 2
         );
-
 
         ctx.fill();
 
@@ -3684,7 +3309,6 @@ function drawFood() {
 
                 ctx.beginPath();
 
-
                 ctx.ellipse(
                     seed[0] *
                     tileSize,
@@ -3702,7 +3326,6 @@ function drawFood() {
                     Math.PI * 2
                 );
 
-
                 ctx.fill();
             }
         );
@@ -3711,12 +3334,9 @@ function drawFood() {
         ctx.strokeStyle =
             "#00ff66";
 
-
         ctx.lineWidth = 2;
 
-
         ctx.beginPath();
-
 
         ctx.arc(
             0,
@@ -3725,7 +3345,6 @@ function drawFood() {
             0,
             Math.PI * 2
         );
-
 
         ctx.stroke();
     }
@@ -3788,7 +3407,6 @@ function drawSnake() {
                     ? 18
                     : 8;
 
-
             ctx.shadowColor =
                 color;
 
@@ -3798,7 +3416,6 @@ function drawSnake() {
 
 
             ctx.beginPath();
-
 
             ctx.roundRect(
 
@@ -3817,7 +3434,6 @@ function drawSnake() {
                 tileSize * 0.18
             );
 
-
             ctx.fill();
         }
     );
@@ -3828,9 +3444,7 @@ function drawSnake() {
     ctx.globalAlpha = 1;
 
 
-    if (
-        !deathAnimation
-    )
+    if (!deathAnimation)
         drawEyes();
 }
 
@@ -3966,7 +3580,6 @@ function drawEyes() {
 
     ctx.beginPath();
 
-
     ctx.arc(
         eye1.x,
         eye1.y,
@@ -3975,12 +3588,10 @@ function drawEyes() {
         Math.PI * 2
     );
 
-
     ctx.fill();
 
 
     ctx.beginPath();
-
 
     ctx.arc(
         eye2.x,
@@ -3989,7 +3600,6 @@ function drawEyes() {
         0,
         Math.PI * 2
     );
-
 
     ctx.fill();
 }
@@ -4019,7 +3629,7 @@ function draw() {
 
 
         screenShake *=
-            0.88;
+            Math.pow(0.88, frameScale);
 
 
         if (
@@ -4064,7 +3674,7 @@ function draw() {
 
 
         redFlash *=
-            0.90;
+            Math.pow(0.90, frameScale);
     }
 
 
@@ -4090,7 +3700,7 @@ function draw() {
 
 
         obstacleFlash *=
-            0.88;
+            Math.pow(0.88, frameScale);
     }
 
 
@@ -4104,65 +3714,27 @@ function draw() {
 
 function gameLoop(time) {
 
-    /*
-       Frame delta.
-
-       The maximum delta is limited so a
-       temporary browser freeze cannot cause
-       a huge physics jump.
-    */
-
-    let frameDelta =
-        time - lastTime;
-
-
-    if (
-        frameDelta < 0 ||
-        !Number.isFinite(frameDelta)
-    ) {
-
-        frameDelta = 0;
-    }
-
-
-    /*
-       Prevent giant timing jumps.
-    */
-
-    frameDelta =
+    const elapsed =
         Math.min(
-            frameDelta,
-            50
+            time - lastTime,
+            250
         );
 
+    frameScale =
+        Math.max(0, elapsed) / 16.6667;
 
-    lastTime =
-        time;
+    updateParticles();
 
+    foodPulse +=
+        Math.max(0, elapsed) * 0.0048;
 
-    /*
-       Particle updates use the same
-       frame timing as the main loop.
-    */
-
-    updateParticles(
-        frameDelta
-    );
-
-
-    /*
-       Eat effect
-    */
 
     if (
         eatColorEffect > 0
     ) {
 
         eatColorEffect *=
-            Math.pow(
-                0.91,
-                frameDelta / 16.6667
-            );
+            Math.pow(0.91, frameScale);
 
 
         if (
@@ -4174,84 +3746,34 @@ function gameLoop(time) {
     }
 
 
-    /*
-       Death animation
-    */
-
     if (
         deathAnimation
     ) {
 
         deathTimer +=
-            frameDelta / 1000;
+            Math.max(0, elapsed) / 1000;
     }
 
-
-    /*
-       Fixed game updates
-    */
 
     if (
         gameRunning
     ) {
 
-        gameAccumulator +=
-            frameDelta;
-
-
-        let updates = 0;
-
-
-        while (
-
-            gameAccumulator >=
-            gameSpeed &&
-
-            updates < 4 &&
-
-            gameRunning
-
+        if (
+            elapsed >=
+            gameSpeed
         ) {
 
             update();
 
-
-            gameAccumulator -=
-                gameSpeed;
-
-
-            updates++;
-        }
-
-
-        /*
-           Never allow a huge backlog.
-        */
-
-        if (
-            gameAccumulator >
-            gameSpeed * 4
-        ) {
-
-            gameAccumulator = 0;
+            lastTime =
+                time;
         }
     }
 
 
-    /*
-       Render every browser frame.
-
-       requestAnimationFrame automatically
-       follows the display refresh rate.
-    */
-
     draw();
 
-
-    /*
-       Continue only while the game or
-       visual effects are active.
-    */
 
     if (
 
@@ -4276,8 +3798,7 @@ function gameLoop(time) {
 
     } else {
 
-        animationFrameId =
-            null;
+        animationFrameId = null;
     }
 }
 
@@ -4303,9 +3824,8 @@ document.addEventListener(
 
             event.preventDefault();
 
-
             if (
-                direction.y !== 1
+                nextDirection.y !== 1
             ) {
 
                 nextDirection = {
@@ -4325,9 +3845,8 @@ document.addEventListener(
 
             event.preventDefault();
 
-
             if (
-                direction.y !== -1
+                nextDirection.y !== -1
             ) {
 
                 nextDirection = {
@@ -4347,9 +3866,8 @@ document.addEventListener(
 
             event.preventDefault();
 
-
             if (
-                direction.x !== 1
+                nextDirection.x !== 1
             ) {
 
                 nextDirection = {
@@ -4369,9 +3887,8 @@ document.addEventListener(
 
             event.preventDefault();
 
-
             if (
-                direction.x !== -1
+                nextDirection.x !== -1
             ) {
 
                 nextDirection = {
@@ -4406,15 +3923,16 @@ function setDirection(
 ) {
 
     if (
-        x !== -direction.x ||
-        y !== -direction.y
+        x === -nextDirection.x &&
+        y === -nextDirection.y
     ) {
-
-        nextDirection = {
-            x: x,
-            y: y
-        };
+        return;
     }
+
+    nextDirection = {
+        x: x,
+        y: y
+    };
 }
 
 
@@ -4452,6 +3970,11 @@ async function toggleFullscreen() {
 
     } catch (error) {
 
+        /*
+           Fallback for mobile browsers
+           that restrict Fullscreen API.
+        */
+
         document.body.classList.toggle(
             "mobileFullscreen"
         );
@@ -4462,7 +3985,6 @@ async function toggleFullscreen() {
         () => {
 
             resizeCanvas();
-
 
             if (
                 snake &&
@@ -4488,7 +4010,6 @@ document.addEventListener(
 
         resizeCanvas();
 
-
         if (
             snake &&
             food
@@ -4510,7 +4031,6 @@ window.addEventListener(
 
         resizeCanvas();
 
-
         if (
             snake &&
             food
@@ -4523,50 +4043,12 @@ window.addEventListener(
 
 
 /* =================================
-   VISIBILITY / TAB PERFORMANCE
-   ================================= */
-
-document.addEventListener(
-    "visibilitychange",
-    () => {
-
-        /*
-           When the browser pauses the tab,
-           reset the timing when it becomes
-           visible again. This prevents a
-           giant frame jump.
-        */
-
-        if (
-            !document.hidden
-        ) {
-
-            const now =
-                performance.now();
-
-
-            lastTime =
-                now;
-
-
-            lastParticleTime =
-                now;
-
-
-            gameAccumulator = 0;
-        }
-    }
-);
-
-
-/* =================================
    START
    ================================= */
 
 resizeCanvas();
 
 startGame();
-
 
 </script>
 
