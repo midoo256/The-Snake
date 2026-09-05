@@ -916,8 +916,6 @@ let gameSpeed = 115;
 
 let lastTime = 0;
 
-let gameAccumulator = 0;
-
 let animationFrameId = null;
 
 let audioContext = null;
@@ -1542,9 +1540,6 @@ function startGame() {
 
     lastTime =
         performance.now();
-
-    gameAccumulator = 0;
-
 
     particles = [];
 
@@ -3736,16 +3731,15 @@ function gameLoop(time) {
         gameRunning
     ) {
 
-        gameAccumulator += elapsed;
-
-        while (
-            gameAccumulator >= gameSpeed &&
-            gameRunning
+        if (
+            elapsed >=
+            gameSpeed
         ) {
 
             update();
 
-            gameAccumulator -= gameSpeed;
+            lastTime =
+                time;
         }
     }
 
@@ -4025,7 +4019,6 @@ document.addEventListener(
     () => {
 
         lastTime = performance.now();
-        gameAccumulator = 0;
     },
     { passive: true }
 );
