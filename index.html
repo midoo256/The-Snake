@@ -916,6 +916,8 @@ let gameSpeed = 115;
 
 let lastTime = 0;
 
+let gameAccumulator = 0;
+
 let animationFrameId = null;
 
 let audioContext = null;
@@ -1293,115 +1295,83 @@ document.addEventListener(
    ================================= */
 
 let touchStartX = 0;
-
 let touchStartY = 0;
+let touchActive = false;
 
-
-document.addEventListener(
+canvas.addEventListener(
     "touchstart",
     event => {
 
-        if (
-            event.touches.length !== 1
-        ) {
+        if (event.touches.length !== 1) {
+            touchActive = false;
             return;
         }
 
+        const touch = event.touches[0];
 
-        touchStartX =
-            event.touches[0].clientX;
+        touchStartX = touch.clientX;
+        touchStartY = touch.clientY;
+        touchActive = true;
 
-        touchStartY =
-            event.touches[0].clientY;
+        event.preventDefault();
     },
-    {
-        passive: true
-    }
+    { passive: false }
 );
 
-
-document.addEventListener(
+canvas.addEventListener(
     "touchend",
     event => {
 
-        if (
-            event.changedTouches.length !== 1
-        ) {
+        if (!touchActive || event.changedTouches.length !== 1) {
+            touchActive = false;
             return;
         }
 
+        const touch = event.changedTouches[0];
 
-        const touch =
-            event.changedTouches[0];
+        const deltaX = touch.clientX - touchStartX;
+        const deltaY = touch.clientY - touchStartY;
 
-
-        const deltaX =
-            touch.clientX -
-            touchStartX;
-
-        const deltaY =
-            touch.clientY -
-            touchStartY;
-
+        touchActive = false;
 
         const minSwipeDistance = 25;
 
-
         if (
-
-            Math.abs(deltaX) <
-            minSwipeDistance &&
-
-            Math.abs(deltaY) <
-            minSwipeDistance
-
+            Math.abs(deltaX) < minSwipeDistance &&
+            Math.abs(deltaY) < minSwipeDistance
         ) {
-
+            event.preventDefault();
             return;
         }
 
-
-        if (
-            Math.abs(deltaX) >
-            Math.abs(deltaY)
-        ) {
+        if (Math.abs(deltaX) > Math.abs(deltaY)) {
 
             if (deltaX > 0) {
-
-                setDirection(
-                    1,
-                    0
-                );
-
+                setDirection(1, 0);
             } else {
-
-                setDirection(
-                    -1,
-                    0
-                );
+                setDirection(-1, 0);
             }
 
         } else {
 
             if (deltaY > 0) {
-
-                setDirection(
-                    0,
-                    1
-                );
-
+                setDirection(0, 1);
             } else {
-
-                setDirection(
-                    0,
-                    -1
-                );
+                setDirection(0, -1);
             }
         }
+
+        event.preventDefault();
     },
-    {
-        passive: true
-    }
+    { passive: false }
+);
+
+canvas.addEventListener(
+    "touchcancel",
+    () => {
+        touchActive = false;
+    },
+    { passive: true }
 );
 
 
@@ -1474,7 +1444,7 @@ function resizeCanvas() {
         );
 
 
-    canvas.width =
+    const newSize =
         Math.max(
             GRID,
             Math.floor(
@@ -1482,10 +1452,15 @@ function resizeCanvas() {
             ) * GRID
         );
 
+    if (
+        canvas.width === newSize &&
+        canvas.height === newSize
+    ) {
+        return;
+    }
 
-    canvas.height =
-        canvas.width;
-
+    canvas.width = newSize;
+    canvas.height = newSize;
 
     tileSize =
         canvas.width / GRID;
@@ -1567,6 +1542,8 @@ function startGame() {
 
     lastTime =
         performance.now();
+
+    gameAccumulator = 0;
 
 
     particles = [];
@@ -3759,15 +3736,16 @@ function gameLoop(time) {
         gameRunning
     ) {
 
-        if (
-            elapsed >=
-            gameSpeed
+        gameAccumulator += elapsed;
+
+        while (
+            gameAccumulator >= gameSpeed &&
+            gameRunning
         ) {
 
             update();
 
-            lastTime =
-                time;
+            gameAccumulator -= gameSpeed;
         }
     }
 
@@ -4039,6 +4017,17 @@ window.addEventListener(
             draw();
         }
     }
+);
+
+
+document.addEventListener(
+    "visibilitychange",
+    () => {
+
+        lastTime = performance.now();
+        gameAccumulator = 0;
+    },
+    { passive: true }
 );
 
 
