@@ -918,6 +918,14 @@ let lastTime = 0;
 
 let gameAccumulator = 0;
 
+// Mobile performance optimization
+const isMobileDevice = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+const maxParticles = isMobileDevice ? 70 : 140;
+const maxFoodParticles = isMobileDevice ? 24 : 50;
+const maxObstacleParticles = isMobileDevice ? 32 : 70;
+let lastParticleTime = performance.now();
+
+
 let animationFrameId = null;
 
 let audioContext = null;
@@ -2259,75 +2267,44 @@ function createDeathExplosion() {
    ================================= */
 
 function updateParticles() {
+    const now = performance.now();
+    const dt = Math.min((now - lastParticleTime) / 16.6667, 2.0);
+    lastParticleTime = now;
 
-    particles.forEach(p => {
+    // Keep particle counts bounded so mobile GPUs/CPUs do not get overloaded.
+    if (particles.length > maxParticles) particles.length = maxParticles;
+    if (foodParticles.length > maxFoodParticles) foodParticles.length = maxFoodParticles;
+    if (obstacleParticles.length > maxObstacleParticles) obstacleParticles.length = maxObstacleParticles;
 
-        p.x += p.vx;
+    for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.vx *= Math.pow(0.96, dt);
+        p.vy *= Math.pow(0.96, dt);
+        p.life -= 0.035 * dt;
+        if (p.life <= 0) particles.splice(i, 1);
+    }
 
-        p.y += p.vy;
+    for (let i = foodParticles.length - 1; i >= 0; i--) {
+        const p = foodParticles[i];
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.vx *= Math.pow(0.94, dt);
+        p.vy *= Math.pow(0.94, dt);
+        p.life -= 0.045 * dt;
+        if (p.life <= 0) foodParticles.splice(i, 1);
+    }
 
-        p.vx *= 0.97;
-
-        p.vy *= 0.97;
-
-        p.vy += 0.08;
-
-        p.life -= 0.025;
-
-        p.size *= 0.985;
-    });
-
-
-    particles =
-        particles.filter(
-            p => p.life > 0
-        );
-
-
-    foodParticles.forEach(p => {
-
-        p.x += p.vx;
-
-        p.y += p.vy;
-
-        p.vx *= 0.96;
-
-        p.vy *= 0.96;
-
-        p.life -= 0.035;
-
-        p.size *= 0.97;
-    });
-
-
-    foodParticles =
-        foodParticles.filter(
-            p => p.life > 0
-        );
-
-
-    obstacleParticles.forEach(p => {
-
-        p.x += p.vx;
-
-        p.y += p.vy;
-
-        p.vx *= 0.97;
-
-        p.vy *= 0.97;
-
-        p.vy += 0.06;
-
-        p.life -= 0.025;
-
-        p.size *= 0.975;
-    });
-
-
-    obstacleParticles =
-        obstacleParticles.filter(
-            p => p.life > 0
-        );
+    for (let i = obstacleParticles.length - 1; i >= 0; i--) {
+        const p = obstacleParticles[i];
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.vx *= Math.pow(0.93, dt);
+        p.vy *= Math.pow(0.93, dt);
+        p.life -= 0.04 * dt;
+        if (p.life <= 0) obstacleParticles.splice(i, 1);
+    }
 }
 
 
