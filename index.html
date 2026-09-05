@@ -291,6 +291,8 @@ body {
 canvas {
 
     display: block;
+    touch-action: none;
+    overscroll-behavior: none;
 
     background: #090909;
 
@@ -1295,6 +1297,7 @@ document.addEventListener(
 let touchStartX = 0;
 let touchStartY = 0;
 let touchActive = false;
+let touchDirectionLocked = false;
 
 canvas.addEventListener(
     "touchstart",
@@ -1310,6 +1313,7 @@ canvas.addEventListener(
         touchStartX = touch.clientX;
         touchStartY = touch.clientY;
         touchActive = true;
+        touchDirectionLocked = false;
 
         event.preventDefault();
     },
@@ -1342,6 +1346,11 @@ canvas.addEventListener(
             return;
         }
 
+        if (touchDirectionLocked) {
+            event.preventDefault();
+            return;
+        }
+
         if (Math.abs(deltaX) > Math.abs(deltaY)) {
 
             if (deltaX > 0) {
@@ -1359,6 +1368,7 @@ canvas.addEventListener(
             }
         }
 
+        touchDirectionLocked = true;
         event.preventDefault();
     },
     { passive: false }
@@ -1368,6 +1378,7 @@ canvas.addEventListener(
     "touchcancel",
     () => {
         touchActive = false;
+        touchDirectionLocked = false;
     },
     { passive: true }
 );
@@ -2392,6 +2403,8 @@ function drawParticles() {
    ================================= */
 
 function update() {
+
+    touchDirectionLocked = false;
 
     direction =
         nextDirection;
