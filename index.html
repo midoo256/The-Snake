@@ -41,12 +41,6 @@ body {
         sans-serif;
 
     touch-action: none;
-
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
-
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
 }
 
 
@@ -82,12 +76,6 @@ body {
 
     border-bottom:
         1px solid #202020;
-
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
-
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
 }
 
 
@@ -207,16 +195,6 @@ body {
             #101010 0%,
             #050505 70%
         );
-
-    contain: layout paint style;
-
-    isolation: isolate;
-
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
-
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
 }
 
 
@@ -327,14 +305,6 @@ canvas {
 
     max-width: 100%;
     max-height: 100%;
-
-    contain: strict;
-
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
-
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
 }
 
 
@@ -386,9 +356,6 @@ canvas {
         0 0 45px rgba(255,255,255,0.25);
     white-space: nowrap;
     will-change: transform, opacity;
-
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
 }
 
 #feedbackText.show {
@@ -429,12 +396,6 @@ canvas {
         );
 
     backdrop-filter: blur(8px);
-
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
-
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
 }
 
 
@@ -462,9 +423,6 @@ canvas {
     animation:
         gameOverIn 0.55s
         cubic-bezier(.2,.8,.2,1);
-
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
 }
 
 
@@ -1500,36 +1458,42 @@ highScoreElement.textContent =
    RESIZE
    ================================= */
 
+let resizeTimer = null;
+let lastCanvasSize = 0;
+
 function resizeCanvas() {
 
-    let width =
-        window.innerWidth - 8;
-
-    let height =
-        window.innerHeight - 8;
-
-
-    if (
+    const isMobile =
         window.matchMedia(
             "(max-width: 700px)"
-        ).matches
-    ) {
+        ).matches;
 
-        const navbarHeight = 55;
+    const navbarHeight =
+        isMobile ? 55 : 64;
 
-        height =
-            window.innerHeight -
-            navbarHeight -
-            8;
-    }
+    const viewportWidth =
+        window.visualViewport
+            ? window.visualViewport.width
+            : window.innerWidth;
 
+    const viewportHeight =
+        window.visualViewport
+            ? window.visualViewport.height
+            : window.innerHeight;
+
+    const width =
+        viewportWidth - 8;
+
+    const height =
+        viewportHeight -
+        navbarHeight -
+        8;
 
     const size =
         Math.min(
             width,
             height
         );
-
 
     const newSize =
         Math.max(
@@ -1540,11 +1504,14 @@ function resizeCanvas() {
         );
 
     if (
+        lastCanvasSize === newSize &&
         canvas.width === newSize &&
         canvas.height === newSize
     ) {
         return;
     }
+
+    lastCanvasSize = newSize;
 
     canvas.width = newSize;
     canvas.height = newSize;
@@ -1556,49 +1523,31 @@ function resizeCanvas() {
     backgroundCacheSize = 0;
 }
 
-
-/* =================================
-   SAFE MOBILE RESIZE
-   ================================= */
-
-let resizeTimer = null;
-let lastCanvasSize = 0;
-
 function safeResize() {
 
-    if (resizeTimer !== null) {
+    if (resizeTimer) {
         clearTimeout(resizeTimer);
     }
 
-    resizeTimer = setTimeout(
-        () => {
+    resizeTimer =
+        setTimeout(
+            () => {
 
-            resizeTimer = null;
+                resizeTimer = null;
 
-            const beforeSize =
-                canvas.width;
-
-            resizeCanvas();
-
-            if (
-                canvas.width !== beforeSize ||
-                canvas.width !== lastCanvasSize
-            ) {
-
-                lastCanvasSize =
-                    canvas.width;
+                resizeCanvas();
 
                 if (
                     snake &&
                     food
                 ) {
+
                     draw();
                 }
-            }
 
-        },
-        80
-    );
+            },
+            120
+        );
 }
 
 
@@ -4092,7 +4041,7 @@ async function toggleFullscreen() {
     setTimeout(
         () => {
 
-            safeResize();
+            resizeCanvas();
 
             if (
                 snake &&
@@ -4116,7 +4065,7 @@ document.addEventListener(
     "fullscreenchange",
     () => {
 
-        safeResize();
+        resizeCanvas();
 
         if (
             snake &&
@@ -4138,11 +4087,6 @@ window.addEventListener(
     safeResize,
     { passive: true }
 );
-
-
-/* =================================
-   VISUAL VIEWPORT RESIZE
-   ================================= */
 
 if (window.visualViewport) {
 
@@ -4173,9 +4117,6 @@ document.addEventListener(
    ================================= */
 
 resizeCanvas();
-
-lastCanvasSize =
-    canvas.width;
 
 startGame();
 
