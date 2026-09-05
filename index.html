@@ -44,6 +44,10 @@ body {
 }
 
 
+/* =================================
+   NAVBAR
+   ================================= */
+
 #navbar {
 
     position: fixed;
@@ -74,6 +78,8 @@ body {
         1px solid #202020;
 }
 
+
+/* LOGO */
 
 .logo {
 
@@ -128,6 +134,8 @@ body {
 }
 
 
+/* FULLSCREEN BUTTON */
+
 #fullscreenBtn {
 
     border: 1px solid #333;
@@ -155,6 +163,10 @@ body {
     border-color: #00ff66;
 }
 
+
+/* =================================
+   GAME CONTAINER
+   ================================= */
 
 #gameContainer {
 
@@ -185,6 +197,10 @@ body {
         );
 }
 
+
+/* =================================
+   SCORE
+   ================================= */
 
 #topBar {
 
@@ -268,6 +284,10 @@ body {
 }
 
 
+/* =================================
+   CANVAS
+   ================================= */
+
 canvas {
 
     display: block;
@@ -283,10 +303,12 @@ canvas {
 
     max-width: 100%;
     max-height: 100%;
-
-    image-rendering: auto;
 }
 
+
+/* =================================
+   DESKTOP CONTROLS
+   ================================= */
 
 #controls {
 
@@ -308,6 +330,47 @@ canvas {
     white-space: nowrap;
 }
 
+
+/* =================================
+   FEEDBACK TEXT
+   ================================= */
+
+#feedbackText {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) scale(0.4);
+    z-index: 80;
+    pointer-events: none;
+    opacity: 0;
+    font-size: clamp(24px, 5vw, 54px);
+    font-weight: 900;
+    font-style: italic;
+    letter-spacing: 2px;
+    color: #00ff66;
+    text-shadow:
+        0 0 8px currentColor,
+        0 0 24px currentColor,
+        0 0 45px rgba(255,255,255,0.25);
+    white-space: nowrap;
+    will-change: transform, opacity;
+}
+
+#feedbackText.show {
+    animation: feedbackPop 0.72s cubic-bezier(.16,1.35,.35,1) forwards;
+}
+
+@keyframes feedbackPop {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.35) rotate(-8deg); }
+    18% { opacity: 1; transform: translate(-50%, -50%) scale(1.18) rotate(3deg); }
+    42% { transform: translate(-50%, -50%) scale(0.96) rotate(-2deg); }
+    68% { opacity: 1; transform: translate(-50%, -62%) scale(1) rotate(0deg); }
+    100% { opacity: 0; transform: translate(-50%, -82%) scale(0.9) rotate(0deg); }
+}
+
+/* =================================
+   GAME OVER
+   ================================= */
 
 #gameOver {
 
@@ -505,23 +568,13 @@ canvas {
 
 :fullscreen #gameContainer {
 
-    top: 0;
-
-    left: 0;
+    top: 64px;
 
     width: 100vw;
 
-    height: 100vh;
+    height: calc(100vh - 64px);
 
-    height: 100dvh;
-}
-
-
-:fullscreen canvas {
-
-    max-width: 100vw;
-
-    max-height: 100dvh;
+    height: calc(100dvh - 64px);
 }
 
 
@@ -620,67 +673,31 @@ canvas {
 
         font-size: 45px;
     }
+}
 
+
+/* =================================
+   MOBILE FULLSCREEN
+   ================================= */
+
+@media (max-width: 700px) {
 
     :fullscreen #navbar {
 
-        display: none;
+        height: 55px;
     }
 
 
     :fullscreen #gameContainer {
 
-        top: 0;
+        top: 55px;
 
-        left: 0;
+        height: calc(100vh - 55px);
 
-        width: 100vw;
-
-        height: 100vh;
-
-        height: 100dvh;
-
-        padding: 0;
-    }
-
-
-    :fullscreen canvas {
-
-        max-width: 100vw;
-
-        max-height: 100dvh;
-    }
-
-
-    body.mobileFullscreen #navbar {
-
-        display: none;
-    }
-
-
-    body.mobileFullscreen #gameContainer {
-
-        top: 0;
-
-        left: 0;
-
-        width: 100vw;
-
-        height: 100vh;
-
-        height: 100dvh;
-
-        padding: 0;
-    }
-
-
-    body.mobileFullscreen canvas {
-
-        max-width: 100vw;
-
-        max-height: 100dvh;
+        height: calc(100dvh - 55px);
     }
 }
+
 
 </style>
 
@@ -689,6 +706,10 @@ canvas {
 
 <body>
 
+
+<!-- =================================
+     NAVBAR
+     ================================= -->
 
 <nav id="navbar">
 
@@ -715,8 +736,15 @@ canvas {
 </nav>
 
 
+
+<!-- =================================
+     GAME
+     ================================= -->
+
 <div id="gameContainer">
 
+
+    <!-- SCORE -->
 
     <div id="topBar">
 
@@ -754,8 +782,16 @@ canvas {
     </div>
 
 
+
+    <!-- FEEDBACK TEXT -->
+    <div id="feedbackText"></div>
+
+    <!-- GAME CANVAS -->
     <canvas id="game"></canvas>
 
+
+
+    <!-- DESKTOP -->
 
     <div id="controls">
 
@@ -763,6 +799,9 @@ canvas {
 
     </div>
 
+
+
+    <!-- GAME OVER -->
 
     <div id="gameOver">
 
@@ -800,6 +839,7 @@ canvas {
 </div>
 
 
+
 <script>
 
 
@@ -814,12 +854,12 @@ const ctx =
     canvas.getContext(
         "2d",
         {
-            alpha: false
+            alpha: false,
+            desynchronized: true
         }
     );
 
-
-ctx.imageSmoothingEnabled = true;
+ctx.imageSmoothingEnabled = false;
 
 
 /* =================================
@@ -838,6 +878,9 @@ const gameOver =
 const finalScore =
     document.getElementById("finalScore");
 
+const feedbackText =
+    document.getElementById("feedbackText");
+
 
 /* =================================
    GAME SETTINGS
@@ -846,6 +889,9 @@ const finalScore =
 const GRID = 32;
 
 let tileSize;
+
+let backgroundCache = null;
+let backgroundCacheSize = 0;
 
 let snake;
 
@@ -870,16 +916,268 @@ let gameSpeed = 115;
 
 let lastTime = 0;
 
+let gameAccumulator = 0;
+
 let animationFrameId = null;
 
+let audioContext = null;
+let audioMaster = null;
+let feedbackTimer = null;
 
-/* =================================
-   HIGH FPS TIMING
-   ================================= */
+function initAudio() {
+    if (!audioContext) {
+        const AudioCtx =
+            window.AudioContext ||
+            window.webkitAudioContext;
 
-let accumulator = 0;
+        if (!AudioCtx)
+            return;
 
-const MAX_FRAME_DELTA = 50;
+        audioContext = new AudioCtx();
+        audioMaster =
+            audioContext.createGain();
+
+        audioMaster.gain.value = 0.16;
+        audioMaster.connect(
+            audioContext.destination
+        );
+    }
+
+    if (
+        audioContext &&
+        audioContext.state === "suspended"
+    ) {
+        audioContext.resume();
+    }
+}
+
+function tone(
+    frequency,
+    duration,
+    type = "square",
+    volume = 0.08,
+    slideTo = null
+) {
+    initAudio();
+
+    if (!audioContext || !audioMaster)
+        return;
+
+    const now =
+        audioContext.currentTime;
+
+    const oscillator =
+        audioContext.createOscillator();
+
+    const gain =
+        audioContext.createGain();
+
+    oscillator.type = type;
+    oscillator.frequency.setValueAtTime(
+        frequency,
+        now
+    );
+
+    if (slideTo !== null) {
+        oscillator.frequency.exponentialRampToValueAtTime(
+            Math.max(25, slideTo),
+            now + duration
+        );
+    }
+
+    gain.gain.setValueAtTime(
+        0.0001,
+        now
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        volume,
+        now + 0.008
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        0.0001,
+        now + duration
+    );
+
+    oscillator.connect(gain);
+    gain.connect(audioMaster);
+
+    oscillator.start(now);
+    oscillator.stop(
+        now + duration + 0.015
+    );
+}
+
+function playExplosionSound() {
+    initAudio();
+
+    if (!audioContext)
+        return;
+
+    tone(
+        110,
+        0.28,
+        "sawtooth",
+        0.20,
+        38
+    );
+
+    tone(
+        65,
+        0.18,
+        "triangle",
+        0.13,
+        32
+    );
+}
+
+function playLoseSound() {
+
+    initAudio();
+
+    if (
+        !audioContext ||
+        !audioMaster
+    )
+        return;
+
+    /*
+       Original retro platform-game
+       lose sound. It has the same
+       kind of short descending feel
+       as classic games, but is not
+       a copy of Mario's audio.
+    */
+
+    const notes = [
+        {
+            frequency: 392,
+            duration: 0.12,
+            delay: 0
+        },
+        {
+            frequency: 330,
+            duration: 0.12,
+            delay: 0.12
+        },
+        {
+            frequency: 262,
+            duration: 0.16,
+            delay: 0.24
+        },
+        {
+            frequency: 196,
+            duration: 0.28,
+            delay: 0.40
+        }
+    ];
+
+    notes.forEach(note => {
+
+        setTimeout(
+            () => {
+
+                tone(
+                    note.frequency,
+                    note.duration,
+                    "square",
+                    0.09,
+                    note.frequency * 0.92
+                );
+
+            },
+            note.delay * 1000
+        );
+
+    });
+}
+
+const eatSoundPatterns = [
+    [660, 880],
+    [523, 784],
+    [740, 988],
+    [587, 880],
+    [698, 1047],
+    [494, 740],
+    [622, 932],
+    [784, 1175]
+];
+
+let eatSoundIndex = 0;
+
+function playEatSound() {
+    const pattern =
+        eatSoundPatterns[
+            eatSoundIndex %
+            eatSoundPatterns.length
+        ];
+
+    eatSoundIndex++;
+
+    tone(
+        pattern[0],
+        0.075,
+        "square",
+        0.055,
+        pattern[1]
+    );
+
+    setTimeout(
+        () =>
+            tone(
+                pattern[1],
+                0.11,
+                "triangle",
+                0.05
+            ),
+        58
+    );
+}
+
+const feedbackWords = [
+    "AMAZING!",
+    "AWESOME!",
+    "NICE!",
+    "YUMMY!",
+    "GREAT!",
+    "DELICIOUS!",
+    "WOW!",
+    "PERFECT!"
+];
+
+let feedbackIndex = 0;
+
+function showFeedback() {
+    const word =
+        feedbackWords[
+            feedbackIndex %
+            feedbackWords.length
+        ];
+
+    feedbackIndex++;
+
+    feedbackText.textContent = word;
+    feedbackText.style.color =
+        currentFruit.color;
+
+    feedbackText.classList.remove("show");
+
+    void feedbackText.offsetWidth;
+
+    feedbackText.classList.add("show");
+
+    if (feedbackTimer)
+        clearTimeout(feedbackTimer);
+
+    feedbackTimer =
+        setTimeout(
+            () => {
+                feedbackText.classList.remove("show");
+            },
+            760
+        );
+}
 
 
 /* =================================
@@ -993,6 +1291,23 @@ let obstacleParticles = [];
 let obstacleCount = 0;
 
 let obstacleFlash = 0;
+
+
+/* =================================
+   AUDIO UNLOCK
+   ================================= */
+
+document.addEventListener(
+    "pointerdown",
+    initAudio,
+    { passive: true }
+);
+
+document.addEventListener(
+    "keydown",
+    initAudio,
+    { passive: true }
+);
 
 
 /* =================================
@@ -1156,40 +1471,21 @@ function resizeCanvas() {
         window.innerHeight - 8;
 
 
-    const isMobile =
+    if (
         window.matchMedia(
             "(max-width: 700px)"
-        ).matches;
-
-
-    const isFullscreen =
-        !!document.fullscreenElement ||
-        document.body.classList.contains(
-            "mobileFullscreen"
-        );
-
-
-    if (
-        isMobile &&
-        !isFullscreen
+        ).matches
     ) {
+
+        const navbarHeight =
+            document.fullscreenElement
+                ? 55
+                : 55;
 
         height =
             window.innerHeight -
-            55 -
+            navbarHeight -
             8;
-    }
-
-
-    if (
-        isFullscreen
-    ) {
-
-        width =
-            window.innerWidth;
-
-        height =
-            window.innerHeight;
     }
 
 
@@ -1200,7 +1496,7 @@ function resizeCanvas() {
         );
 
 
-    const newSize =
+    canvas.width =
         Math.max(
             GRID,
             Math.floor(
@@ -1209,21 +1505,15 @@ function resizeCanvas() {
         );
 
 
-    if (
-        canvas.width !== newSize ||
-        canvas.height !== newSize
-    ) {
-
-        canvas.width =
-            newSize;
-
-        canvas.height =
-            newSize;
-    }
+    canvas.height =
+        canvas.width;
 
 
     tileSize =
         canvas.width / GRID;
+
+    backgroundCache = null;
+    backgroundCacheSize = 0;
 }
 
 
@@ -1266,7 +1556,6 @@ function startGame() {
             x: 13,
             y: 16
         }
-
     ];
 
 
@@ -1291,7 +1580,7 @@ function startGame() {
     lastTime =
         performance.now();
 
-    accumulator = 0;
+    gameAccumulator = 0;
 
 
     particles = [];
@@ -1319,6 +1608,9 @@ function startGame() {
     redFlash = 0;
 
     gameOverReady = false;
+
+    feedbackText.classList.remove("show");
+    feedbackText.textContent = "";
 
 
     currentSnakeColor =
@@ -1373,6 +1665,12 @@ function spawnFood() {
 
     while (!valid) {
 
+        /*
+           Keep food away from the
+           outer edge so its shape
+           can never be clipped.
+        */
+
         food = {
 
             x:
@@ -1386,7 +1684,6 @@ function spawnFood() {
                     Math.random() *
                     (GRID - 4)
                 ) + 2
-
         };
 
 
@@ -1409,6 +1706,12 @@ function spawnFood() {
         }
     }
 
+
+    /*
+       Make sure the next fruit
+       is different from the
+       previous one whenever possible.
+    */
 
     let nextFruit;
 
@@ -1464,6 +1767,7 @@ function addObstacle() {
 
     let newObstacle;
 
+
     let attempts = 0;
 
 
@@ -1488,7 +1792,6 @@ function addObstacle() {
                     Math.random() *
                     (GRID - 4)
                 ) + 2
-
         };
 
 
@@ -1523,6 +1826,11 @@ function addObstacle() {
                 );
         }
 
+
+        /*
+           Don't put an obstacle directly
+           beside the snake head.
+        */
 
         if (
             valid &&
@@ -1622,7 +1930,6 @@ function createObstacleAppearEffect(
 
             color:
                 "#ff8c00"
-
         });
     }
 }
@@ -1648,6 +1955,8 @@ function createObstacleExplosion(
     screenShake = 16;
 
     obstacleFlash = 1;
+
+    playExplosionSound();
 
 
     for (
@@ -1687,9 +1996,24 @@ function createObstacleExplosion(
                 Math.random() > 0.5
                     ? "#ff3030"
                     : "#ff9f00"
-
         });
     }
+}
+
+
+/* =================================
+   OBSTACLE COLLISION
+   ================================= */
+
+function checkObstacleCollision(
+    head
+) {
+
+    return obstacles.some(
+        obstacle =>
+            obstacle.x === head.x &&
+            obstacle.y === head.y
+    );
 }
 
 
@@ -1858,7 +2182,6 @@ function createEatEffect(
 
             color:
                 currentFruit.color
-
         });
     }
 
@@ -1925,7 +2248,6 @@ function createDeathExplosion() {
                     Math.random() * 7 + 2,
 
                 life: 1
-
             });
         }
     });
@@ -2126,9 +2448,12 @@ function update() {
         y:
             snake[0].y +
             direction.y
-
     };
 
+
+    /*
+       WALL
+    */
 
     if (
 
@@ -2142,11 +2467,15 @@ function update() {
 
     ) {
 
-        die();
+        die("wall");
 
         return;
     }
 
+
+    /*
+       OBSTACLE
+    */
 
     const hitObstacle =
         obstacles.find(
@@ -2172,11 +2501,15 @@ function update() {
             );
 
 
-        die();
+        die("bomb");
 
         return;
     }
 
+
+    /*
+       BODY
+    */
 
     if (
 
@@ -2188,7 +2521,7 @@ function update() {
 
     ) {
 
-        die();
+        die("self");
 
         return;
     }
@@ -2196,6 +2529,10 @@ function update() {
 
     snake.unshift(head);
 
+
+    /*
+       APPLE / FRUIT
+    */
 
     if (
 
@@ -2210,12 +2547,20 @@ function update() {
             food.y
         );
 
+        playEatSound();
+        showFeedback();
+
 
         score++;
 
         scoreElement.textContent =
             score;
 
+
+        /*
+           Change snake color
+           after every fruit.
+        */
 
         let newColor;
 
@@ -2268,6 +2613,11 @@ function update() {
             );
 
 
+        /*
+           Add an obstacle every
+           4 points.
+        */
+
         if (
             shouldAddObstacle()
         ) {
@@ -2289,13 +2639,17 @@ function update() {
    DIE
    ================================= */
 
-function die() {
+function die(reason = "self") {
 
     if (deathAnimation)
         return;
 
 
     gameRunning = false;
+
+    if (reason !== "bomb") {
+        playLoseSound();
+    }
 
 
     createDeathExplosion();
@@ -2324,61 +2678,81 @@ function die() {
 
 function drawBackground() {
 
-    ctx.fillStyle =
-        "#090909";
-
-
-    ctx.fillRect(
-        0,
-        0,
-        canvas.width,
-        canvas.height
-    );
-
-
-    ctx.strokeStyle =
-        "#111";
-
-    ctx.lineWidth = 1;
-
-
-    for (
-        let i = 0;
-        i <= GRID;
-        i++
+    if (
+        !backgroundCache ||
+        backgroundCacheSize !== canvas.width
     ) {
+        backgroundCache =
+            document.createElement("canvas");
 
-        ctx.beginPath();
+        backgroundCache.width =
+            canvas.width;
 
-        ctx.moveTo(
-            i * tileSize,
-            0
-        );
+        backgroundCache.height =
+            canvas.height;
 
-        ctx.lineTo(
-            i * tileSize,
-            canvas.height
-        );
+        const bgCtx =
+            backgroundCache.getContext("2d");
 
-        ctx.stroke();
+        bgCtx.fillStyle =
+            "#090909";
 
-
-        ctx.beginPath();
-
-        ctx.moveTo(
+        bgCtx.fillRect(
             0,
-            i * tileSize
+            0,
+            backgroundCache.width,
+            backgroundCache.height
         );
 
-        ctx.lineTo(
-            canvas.width,
-            i * tileSize
-        );
+        bgCtx.strokeStyle =
+            "#111";
 
-        ctx.stroke();
+        bgCtx.lineWidth = 1;
+
+        for (
+            let i = 0;
+            i <= GRID;
+            i++
+        ) {
+            bgCtx.beginPath();
+
+            bgCtx.moveTo(
+                i * tileSize,
+                0
+            );
+
+            bgCtx.lineTo(
+                i * tileSize,
+                backgroundCache.height
+            );
+
+            bgCtx.stroke();
+
+            bgCtx.beginPath();
+
+            bgCtx.moveTo(
+                0,
+                i * tileSize
+            );
+
+            bgCtx.lineTo(
+                backgroundCache.width,
+                i * tileSize
+            );
+
+            bgCtx.stroke();
+        }
+
+        backgroundCacheSize =
+            canvas.width;
     }
-}
 
+    ctx.drawImage(
+        backgroundCache,
+        0,
+        0
+    );
+}
 
 /* =================================
    DRAW FOOD
@@ -2426,6 +2800,10 @@ function drawFood() {
     const type =
         currentFruit.type;
 
+
+    /*
+       APPLE
+    */
 
     if (
         type === "apple"
@@ -2517,6 +2895,10 @@ function drawFood() {
     }
 
 
+    /*
+       ORANGE
+    */
+
     else if (
         type === "orange"
     ) {
@@ -2586,6 +2968,10 @@ function drawFood() {
     }
 
 
+    /*
+       LEMON
+    */
+
     else if (
         type === "lemon"
     ) {
@@ -2637,6 +3023,10 @@ function drawFood() {
         ctx.stroke();
     }
 
+
+    /*
+       STRAWBERRY
+    */
 
     else if (
         type === "strawberry"
@@ -2727,8 +3117,12 @@ function drawFood() {
                 tileSize * 0.10;
 
             const sy =
-                Math.abs(i - 2) *
-                tileSize * 0.04;
+                tileSize *
+                (
+                    0.00 +
+                    Math.abs(i - 2) *
+                    0.04
+                );
 
 
             ctx.beginPath();
@@ -2747,6 +3141,10 @@ function drawFood() {
         }
     }
 
+
+    /*
+       GRAPE
+    */
 
     else if (
         type === "grape"
@@ -2847,6 +3245,10 @@ function drawFood() {
         ctx.fill();
     }
 
+
+    /*
+       WATERMELON
+    */
 
     else if (
         type === "watermelon"
@@ -3034,7 +3436,6 @@ function drawSnake() {
                 padding * 2,
 
                 tileSize * 0.18
-
             );
 
             ctx.fill();
@@ -3214,38 +3615,6 @@ function drawEyes() {
 
 function draw() {
 
-    /*
-       Clear the whole canvas BEFORE
-       applying screen shake.
-
-       This prevents old frames from
-       appearing around the edges.
-    */
-
-    ctx.save();
-
-    ctx.setTransform(
-        1,
-        0,
-        0,
-        1,
-        0,
-        0
-    );
-
-    ctx.fillStyle =
-        "#090909";
-
-    ctx.fillRect(
-        0,
-        0,
-        canvas.width,
-        canvas.height
-    );
-
-    ctx.restore();
-
-
     ctx.save();
 
 
@@ -3260,7 +3629,6 @@ function draw() {
 
             (Math.random() - 0.5) *
             screenShake
-
         );
 
 
@@ -3302,12 +3670,10 @@ function draw() {
 
 
         ctx.fillRect(
-            -screenShake,
-            -screenShake,
-            canvas.width +
-            screenShake * 2,
-            canvas.height +
-            screenShake * 2
+            0,
+            0,
+            canvas.width,
+            canvas.height
         );
 
 
@@ -3330,12 +3696,10 @@ function draw() {
 
 
         ctx.fillRect(
-            -screenShake,
-            -screenShake,
-            canvas.width +
-            screenShake * 2,
-            canvas.height +
-            screenShake * 2
+            0,
+            0,
+            canvas.width,
+            canvas.height
         );
 
 
@@ -3349,36 +3713,24 @@ function draw() {
 
 
 /* =================================
-   HIGH FPS GAME LOOP
+   GAME LOOP
    ================================= */
 
 function gameLoop(time) {
 
-    let delta =
-        time - lastTime;
-
-
-    if (
-        delta > MAX_FRAME_DELTA
-    ) {
-
-        delta =
-            MAX_FRAME_DELTA;
-    }
-
-
-    lastTime =
-        time;
-
-
-    accumulator +=
-        delta;
-
-
     /*
-       Effects are rendered on every
-       available browser frame.
+       Fixed-step game updates:
+       movement stays consistent even if
+       the browser temporarily drops frames.
     */
+
+    const frameDelta =
+        Math.min(
+            time - lastTime,
+            100
+        );
+
+    lastTime = time;
 
     updateParticles();
 
@@ -3388,10 +3740,7 @@ function gameLoop(time) {
     ) {
 
         eatColorEffect *=
-            Math.pow(
-                0.91,
-                delta / 16.6667
-            );
+            0.91;
 
 
         if (
@@ -3408,32 +3757,50 @@ function gameLoop(time) {
     ) {
 
         deathTimer +=
-            delta / 1000;
+            frameDelta / 1000;
     }
 
-
-    /*
-       Fixed movement timing.
-       Rendering itself runs at the
-       highest FPS available.
-    */
 
     if (
         gameRunning
     ) {
 
+        /*
+           Keep the snake on its fixed
+           gameSpeed while allowing the
+           renderer to remain smooth.
+        */
+
+        gameAccumulator +=
+            frameDelta;
+
+        let updates = 0;
+
         while (
-            accumulator >= gameSpeed
+            gameAccumulator >= gameSpeed &&
+            updates < 4 &&
+            gameRunning
         ) {
 
             update();
 
-            accumulator -=
+            gameAccumulator -=
                 gameSpeed;
 
+            updates++;
+        }
 
-            if (!gameRunning)
-                break;
+        /*
+           If a device freezes briefly,
+           discard the excess backlog instead
+           of creating a burst of updates.
+        */
+
+        if (
+            updates >= 4
+        ) {
+
+            gameAccumulator = 0;
         }
     }
 
@@ -3467,7 +3834,6 @@ function gameLoop(time) {
         animationFrameId = null;
     }
 }
-
 
 /* =================================
    KEYBOARD
@@ -3610,10 +3976,7 @@ async function toggleFullscreen() {
     try {
 
         if (
-            !document.fullscreenElement &&
-            !document.body.classList.contains(
-                "mobileFullscreen"
-            )
+            !document.fullscreenElement
         ) {
 
             if (
@@ -3633,21 +3996,15 @@ async function toggleFullscreen() {
 
         } else {
 
-            if (
-                document.fullscreenElement
-            ) {
-
-                await document.exitFullscreen();
-
-            } else {
-
-                document.body.classList.remove(
-                    "mobileFullscreen"
-                );
-            }
+            await document.exitFullscreen();
         }
 
     } catch (error) {
+
+        /*
+           Fallback for mobile browsers
+           that restrict Fullscreen API.
+        */
 
         document.body.classList.toggle(
             "mobileFullscreen"
@@ -3682,18 +4039,7 @@ document.addEventListener(
     "fullscreenchange",
     () => {
 
-        if (
-            document.fullscreenElement
-        ) {
-
-            document.body.classList.remove(
-                "mobileFullscreen"
-            );
-        }
-
-
         resizeCanvas();
-
 
         if (
             snake &&
