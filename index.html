@@ -41,6 +41,12 @@ body {
         sans-serif;
 
     touch-action: none;
+
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
 }
 
 
@@ -76,6 +82,12 @@ body {
 
     border-bottom:
         1px solid #202020;
+
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
 }
 
 
@@ -195,6 +207,16 @@ body {
             #101010 0%,
             #050505 70%
         );
+
+    contain: layout paint style;
+
+    isolation: isolate;
+
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
 }
 
 
@@ -305,6 +327,14 @@ canvas {
 
     max-width: 100%;
     max-height: 100%;
+
+    contain: strict;
+
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
 }
 
 
@@ -356,6 +386,9 @@ canvas {
         0 0 45px rgba(255,255,255,0.25);
     white-space: nowrap;
     will-change: transform, opacity;
+
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
 }
 
 #feedbackText.show {
@@ -396,6 +429,12 @@ canvas {
         );
 
     backdrop-filter: blur(8px);
+
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
 }
 
 
@@ -423,6 +462,9 @@ canvas {
     animation:
         gameOverIn 0.55s
         cubic-bezier(.2,.8,.2,1);
+
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
 }
 
 
@@ -1473,10 +1515,7 @@ function resizeCanvas() {
         ).matches
     ) {
 
-        const navbarHeight =
-            document.fullscreenElement
-                ? 55
-                : 55;
+        const navbarHeight = 55;
 
         height =
             window.innerHeight -
@@ -1515,6 +1554,51 @@ function resizeCanvas() {
 
     backgroundCache = null;
     backgroundCacheSize = 0;
+}
+
+
+/* =================================
+   SAFE MOBILE RESIZE
+   ================================= */
+
+let resizeTimer = null;
+let lastCanvasSize = 0;
+
+function safeResize() {
+
+    if (resizeTimer !== null) {
+        clearTimeout(resizeTimer);
+    }
+
+    resizeTimer = setTimeout(
+        () => {
+
+            resizeTimer = null;
+
+            const beforeSize =
+                canvas.width;
+
+            resizeCanvas();
+
+            if (
+                canvas.width !== beforeSize ||
+                canvas.width !== lastCanvasSize
+            ) {
+
+                lastCanvasSize =
+                    canvas.width;
+
+                if (
+                    snake &&
+                    food
+                ) {
+                    draw();
+                }
+            }
+
+        },
+        80
+    );
 }
 
 
@@ -4008,7 +4092,7 @@ async function toggleFullscreen() {
     setTimeout(
         () => {
 
-            resizeCanvas();
+            safeResize();
 
             if (
                 snake &&
@@ -4032,7 +4116,7 @@ document.addEventListener(
     "fullscreenchange",
     () => {
 
-        resizeCanvas();
+        safeResize();
 
         if (
             snake &&
@@ -4051,19 +4135,23 @@ document.addEventListener(
 
 window.addEventListener(
     "resize",
-    () => {
-
-        resizeCanvas();
-
-        if (
-            snake &&
-            food
-        ) {
-
-            draw();
-        }
-    }
+    safeResize,
+    { passive: true }
 );
+
+
+/* =================================
+   VISUAL VIEWPORT RESIZE
+   ================================= */
+
+if (window.visualViewport) {
+
+    window.visualViewport.addEventListener(
+        "resize",
+        safeResize,
+        { passive: true }
+    );
+}
 
 
 document.addEventListener(
@@ -4085,6 +4173,9 @@ document.addEventListener(
    ================================= */
 
 resizeCanvas();
+
+lastCanvasSize =
+    canvas.width;
 
 startGame();
 
