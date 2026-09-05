@@ -1298,22 +1298,29 @@ let touchStartX = 0;
 let touchStartY = 0;
 let touchActive = false;
 let touchDirectionLocked = false;
+let touchPointerId = null;
 
 canvas.addEventListener(
-    "touchstart",
+    "pointerdown",
     event => {
 
-        if (event.touches.length !== 1) {
-            touchActive = false;
+        if (event.pointerType !== "touch") {
             return;
         }
 
-        const touch = event.touches[0];
+        if (touchActive) {
+            return;
+        }
 
-        touchStartX = touch.clientX;
-        touchStartY = touch.clientY;
+        touchStartX = event.clientX;
+        touchStartY = event.clientY;
         touchActive = true;
         touchDirectionLocked = false;
+        touchPointerId = event.pointerId;
+
+        try {
+            canvas.setPointerCapture(event.pointerId);
+        } catch (error) {}
 
         event.preventDefault();
     },
@@ -1321,20 +1328,29 @@ canvas.addEventListener(
 );
 
 canvas.addEventListener(
-    "touchend",
+    "pointerup",
     event => {
 
-        if (!touchActive || event.changedTouches.length !== 1) {
-            touchActive = false;
+        if (
+            event.pointerType !== "touch" ||
+            !touchActive ||
+            event.pointerId !== touchPointerId
+        ) {
             return;
         }
 
-        const touch = event.changedTouches[0];
+        const deltaX =
+            event.clientX - touchStartX;
 
-        const deltaX = touch.clientX - touchStartX;
-        const deltaY = touch.clientY - touchStartY;
+        const deltaY =
+            event.clientY - touchStartY;
 
         touchActive = false;
+        touchPointerId = null;
+
+        try {
+            canvas.releasePointerCapture(event.pointerId);
+        } catch (error) {}
 
         const minSwipeDistance = 25;
 
@@ -1375,10 +1391,33 @@ canvas.addEventListener(
 );
 
 canvas.addEventListener(
-    "touchcancel",
-    () => {
+    "pointercancel",
+    event => {
+
+        if (
+            event.pointerType !== "touch" ||
+            event.pointerId !== touchPointerId
+        ) {
+            return;
+        }
+
         touchActive = false;
         touchDirectionLocked = false;
+        touchPointerId = null;
+    },
+    { passive: true }
+);
+
+canvas.addEventListener(
+    "lostpointercapture",
+    event => {
+
+        if (event.pointerId !== touchPointerId) {
+            return;
+        }
+
+        touchActive = false;
+        touchPointerId = null;
     },
     { passive: true }
 );
@@ -4032,6 +4071,10 @@ document.addEventListener(
     () => {
 
         lastTime = performance.now();
+
+        touchActive = false;
+        touchDirectionLocked = false;
+        touchPointerId = null;
     },
     { passive: true }
 );
