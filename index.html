@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
@@ -6,12 +7,12 @@
 <meta charset="UTF-8">
 
 <meta
-    name="viewport"
-    content="width=device-width,
-             initial-scale=1.0,
-             maximum-scale=1.0,
-             user-scalable=no,
-             viewport-fit=cover"
+name="viewport"
+content="width=device-width,
+initial-scale=1.0,
+maximum-scale=1.0,
+user-scalable=no,
+viewport-fit=cover"
 >
 
 <title>The Snake</title>
@@ -27,19 +28,11 @@
 
 html,
 body {
-
     width: 100%;
     height: 100%;
-
     overflow: hidden;
-
     background: #050505;
-
-    font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
-
+    font-family: Arial, Helvetica, sans-serif;
     touch-action: none;
 }
 
@@ -49,117 +42,67 @@ body {
    ================================= */
 
 #navbar {
-
     position: fixed;
-
     top: 0;
     left: 0;
-
     width: 100%;
-
     height: 64px;
-
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
-
     padding: 0 22px;
-
     z-index: 100;
-
-    background:
-        rgba(5, 5, 5, 0.88);
-
+    background: rgba(5, 5, 5, 0.88);
     backdrop-filter: blur(10px);
-
-    border-bottom:
-        1px solid #202020;
+    border-bottom: 1px solid #202020;
 }
 
 
-/* LOGO */
-
 .logo {
-
     display: flex;
-
     align-items: center;
-
     gap: 10px;
-
     font-size: 21px;
-
     font-weight: 900;
-
     letter-spacing: 1px;
-
     color: white;
 }
 
 
 .logoIcon {
-
     width: 36px;
     height: 36px;
-
     border-radius: 10px;
-
     display: flex;
-
     align-items: center;
-
     justify-content: center;
-
     font-size: 23px;
-
     background: #101010;
-
     border: 1px solid #333;
-
-    box-shadow:
-        0 0 15px
-        rgba(0,255,100,0.15);
+    box-shadow: 0 0 15px rgba(0,255,100,0.15);
 }
 
 
 .logo span {
-
     color: #00ff66;
-
-    text-shadow:
-        0 0 12px
-        rgba(0,255,100,0.7);
+    text-shadow: 0 0 12px rgba(0,255,100,0.7);
 }
 
 
-/* FULLSCREEN BUTTON */
-
 #fullscreenBtn {
-
     border: 1px solid #333;
-
     background: #111;
-
     color: #aaa;
-
     border-radius: 9px;
-
     padding: 9px 13px;
-
     cursor: pointer;
-
     font-size: 15px;
-
     transition: 0.2s;
 }
 
 
 #fullscreenBtn:hover {
-
     color: #00ff66;
-
     border-color: #00ff66;
 }
 
@@ -169,32 +112,16 @@ body {
    ================================= */
 
 #gameContainer {
-
     position: fixed;
-
     top: 64px;
     left: 0;
-
     width: 100vw;
-
-    height:
-        calc(100vh - 64px);
-
-    height:
-        calc(100dvh - 64px);
-
+    height: calc(100vh - 64px);
+    height: calc(100dvh - 64px);
     display: flex;
-
     align-items: center;
-
     justify-content: center;
-
-    background:
-        radial-gradient(
-            circle at center,
-            #101010 0%,
-            #050505 70%
-        );
+    background: radial-gradient(circle at center, #101010 0%, #050505 70%);
 }
 
 
@@ -203,84 +130,517 @@ body {
    ================================= */
 
 #topBar {
-
     position: absolute;
-
     top: 15px;
-
     left: 0;
-
     width: 100%;
-
     display: flex;
-
-    justify-content:
-        space-between;
-
+    justify-content: space-between;
     padding: 0 25px;
-
     z-index: 10;
-
     pointer-events: none;
 }
 
 
 .scoreBox {
-
-    background:
-        rgba(12,12,12,0.9);
-
-    border:
-        1px solid #292929;
-
+    background: rgba(12,12,12,0.9);
+    border: 1px solid #292929;
     border-radius: 12px;
-
-    padding:
-        7px 17px;
-
+    padding: 7px 17px;
     min-width: 90px;
-
-    box-shadow:
-        0 0 20px
-        rgba(0,255,100,0.05);
+    box-shadow: 0 0 20px rgba(0,255,100,0.05);
 }
 
 
 .label {
-
     font-size: 9px;
-
     color: #666;
-
     letter-spacing: 2px;
-
     text-transform: uppercase;
 }
 
 
 .value {
-
     margin-top: 2px;
-
     font-size: 22px;
-
     font-weight: bold;
-
     color: #00ff66;
-
-    text-shadow:
-        0 0 10px
-        rgba(0,255,100,0.7);
+    text-shadow: 0 0 10px rgba(0,255,100,0.7);
 }
 
 
 .best {
-
     color: #ffd700;
+    text-shadow: 0 0 10px rgba(255,215,0,0.6);
+}
 
+
+/* =================================
+   HEARTS - NORMAL HEART
+   ================================= */
+
+#heartsBox {
+    position: absolute;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-width: 104px;
+    height: 37px;
+    padding: 5px 10px;
+    border: 1px solid rgba(255,60,90,0.42);
+    border-radius: 16px;
+    background:
+        linear-gradient(
+            135deg,
+            rgba(35,8,14,0.96),
+            rgba(12,12,12,0.94)
+        );
+    box-shadow:
+        0 0 25px rgba(255,40,80,0.16),
+        0 0 45px rgba(255,20,60,0.06),
+        inset 0 0 18px rgba(255,40,80,0.07);
+    pointer-events: none;
+    backdrop-filter: blur(7px);
+}
+
+
+.heart {
+    position: relative;
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+    line-height: 18px;
+    transform: scale(1);
+    opacity: 1;
+    color: #ff1744;
+    filter:
+        drop-shadow(0 0 3px #ff214f)
+        drop-shadow(0 0 8px rgba(255,20,70,0.8))
+        drop-shadow(0 0 14px rgba(255,20,70,0.35));
+    transition:
+        transform 0.18s ease,
+        opacity 0.18s ease,
+        filter 0.18s ease;
+    will-change: transform, filter;
+}
+
+
+.heart.empty {
+    opacity: 0.17;
+    transform: scale(0.72);
+    filter:
+        grayscale(1)
+        brightness(0.45)
+        drop-shadow(0 0 2px rgba(255,255,255,0.08));
+}
+
+
+.heart.losing {
+    animation:
+        heartLose 0.72s
+        cubic-bezier(.15,.9,.3,1);
+}
+
+
+.heart.gaining {
+    animation:
+        heartGain 0.9s
+        cubic-bezier(.12,1.5,.3,1);
+}
+
+
+@keyframes heartLose {
+
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    15% {
+        transform:
+            scale(1.55)
+            translateY(-2px);
+        filter:
+            drop-shadow(0 0 10px #ff1744)
+            drop-shadow(0 0 22px #ff1744)
+            drop-shadow(0 0 36px #ff003c);
+    }
+
+    30% {
+        transform:
+            scale(0.82)
+            translateX(-2px);
+    }
+
+    45% {
+        transform:
+            scale(1.18)
+            translateX(3px);
+        opacity: 0.72;
+    }
+
+    62% {
+        transform:
+            scale(0.62)
+            translateX(-4px);
+        opacity: 0.42;
+    }
+
+    78% {
+        transform:
+            scale(0.8);
+        opacity: 0.22;
+    }
+
+    100% {
+        transform:
+            scale(0.72);
+        opacity: 0.17;
+    }
+}
+
+
+@keyframes heartGain {
+
+    0% {
+        transform:
+            scale(0.2);
+        opacity: 0;
+        filter:
+            drop-shadow(0 0 0 transparent);
+    }
+
+    18% {
+        transform:
+            scale(1.7);
+        opacity: 1;
+        filter:
+            drop-shadow(0 0 12px #ff1744)
+            drop-shadow(0 0 28px #ff1744)
+            drop-shadow(0 0 45px rgba(255,0,70,0.8));
+    }
+
+    35% {
+        transform:
+            scale(0.78);
+    }
+
+    52% {
+        transform:
+            scale(1.38);
+    }
+
+    70% {
+        transform:
+            scale(0.92);
+    }
+
+    100% {
+        transform:
+            scale(1);
+        opacity: 1;
+        filter:
+            drop-shadow(0 0 4px #ff214f)
+            drop-shadow(0 0 10px rgba(255,20,70,0.8))
+            drop-shadow(0 0 15px rgba(255,20,70,0.35));
+    }
+}
+
+
+/* =================================
+   BIG DEATH HEART
+   SAME SHAPE AS NORMAL ❤️
+   ================================= */
+
+#deathHeartOverlay {
+    position: absolute;
+    inset: 0;
+    z-index: 150;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+
+#deathHeartOverlay.show {
+    display: flex;
+}
+
+
+#deathHeart {
+    position: relative;
+    width: min(185px, 42vw);
+    height: min(185px, 42vw);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: scale(0);
+    opacity: 0;
+    filter:
+        drop-shadow(0 0 12px #ff1744)
+        drop-shadow(0 0 32px #ff1744)
+        drop-shadow(0 0 70px rgba(255,0,60,0.8));
+}
+
+
+#deathHeart::before {
+    content: "❤️";
+    display: block;
+    font-size: min(185px, 42vw);
+    line-height: 1;
+    transform: none;
+}
+
+
+#deathHeartOverlay.show #deathHeart {
+    animation:
+        deathHeartBreak
+        1.15s
+        cubic-bezier(.12,.9,.22,1)
+        forwards;
+}
+
+
+@keyframes deathHeartBreak {
+
+    0% {
+        transform:
+            scale(0.12);
+        opacity: 0;
+    }
+
+    10% {
+        transform:
+            scale(0.75);
+        opacity: 1;
+    }
+
+    20% {
+        transform:
+            scale(1.22);
+    }
+
+    30% {
+        transform:
+            scale(0.96);
+    }
+
+    42% {
+        transform:
+            scale(1.08);
+        filter:
+            drop-shadow(0 0 20px #ff1744)
+            drop-shadow(0 0 50px #ff1744)
+            drop-shadow(0 0 85px rgba(255,0,60,0.9));
+    }
+
+    52% {
+        transform:
+            scale(1.04);
+    }
+
+    60% {
+        transform:
+            scale(1.13)
+            translateX(-2px);
+    }
+
+    68% {
+        transform:
+            scale(1.08)
+            translateX(3px);
+    }
+
+    76% {
+        transform:
+            scale(1.12)
+            translateX(-8px);
+    }
+
+    88% {
+        transform:
+            scale(1.38)
+            translateX(-25px);
+        opacity: 0.72;
+    }
+
+    100% {
+        transform:
+            scale(1.9)
+            translateX(-55px);
+        opacity: 0;
+        filter:
+            drop-shadow(0 0 0 transparent);
+    }
+}
+
+
+/* =================================
+   BIG HEART CRACK
+   ================================= */
+
+#deathCrack {
+    position: absolute;
+    width: min(180px, 40vw);
+    height: min(180px, 40vw);
+    opacity: 0;
+    transform: scale(0.4);
+    z-index: 3;
+}
+
+
+#deathHeartOverlay.show #deathCrack {
+    animation:
+        crackAppear
+        0.75s
+        0.47s
+        ease-out
+        forwards;
+}
+
+
+#deathCrack::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 19%;
+    width: 9px;
+    height: 64%;
+    border-radius: 10px;
+    background:
+        linear-gradient(
+            180deg,
+            #ffffff,
+            #ffd9df,
+            #ff4966
+        );
+    box-shadow:
+        0 0 8px #fff,
+        0 0 18px #ff4966,
+        0 0 35px #ff1744;
+    transform:
+        translateX(-50%)
+        rotate(32deg);
+}
+
+
+#deathCrack::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 44%;
+    width: 55px;
+    height: 9px;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow:
+        0 0 8px #fff,
+        0 0 20px #ff4966;
+    transform:
+        translate(-20%,-50%)
+        rotate(-34deg);
+}
+
+
+@keyframes crackAppear {
+
+    0% {
+        opacity: 0;
+        transform: scale(0.2) rotate(-15deg);
+    }
+
+    25% {
+        opacity: 1;
+        transform: scale(1.25) rotate(4deg);
+    }
+
+    48% {
+        opacity: 1;
+        transform: scale(1) rotate(-2deg);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(1.8) rotate(10deg);
+    }
+}
+
+
+/* =================================
+   LIFE FEEDBACK
+   ================================= */
+
+#lifeFeedback {
+    position: absolute;
+    top: 58px;
+    left: 50%;
+    transform:
+        translateX(-50%)
+        translateY(0)
+        scale(0.65);
+    z-index: 155;
+    pointer-events: none;
+    opacity: 0;
+    color: #ff4966;
+    font-size: 16px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    white-space: nowrap;
     text-shadow:
-        0 0 10px
-        rgba(255,215,0,0.6);
+        0 0 8px #ff4966,
+        0 0 20px rgba(255,50,90,0.8);
+}
+
+
+#lifeFeedback.show {
+    animation:
+        lifeFeedbackPop
+        0.8s
+        cubic-bezier(.15,1.3,.35,1)
+        forwards;
+}
+
+
+@keyframes lifeFeedbackPop {
+
+    0% {
+        opacity: 0;
+        transform:
+            translateX(-50%)
+            translateY(10px)
+            scale(0.55);
+    }
+
+    20% {
+        opacity: 1;
+        transform:
+            translateX(-50%)
+            translateY(0)
+            scale(1.15);
+    }
+
+    45% {
+        transform:
+            translateX(-50%)
+            translateY(-2px)
+            scale(0.98);
+    }
+
+    100% {
+        opacity: 0;
+        transform:
+            translateX(-50%)
+            translateY(-22px)
+            scale(0.9);
+    }
 }
 
 
@@ -289,23 +649,14 @@ body {
    ================================= */
 
 canvas {
-
     display: block;
     touch-action: none;
     overscroll-behavior: none;
-
     background: #090909;
-
-    border:
-        2px solid #242424;
-
-    box-shadow:
-        0 0 50px
-        rgba(0,255,100,0.08);
-
+    border: 2px solid #242424;
+    box-shadow: 0 0 50px rgba(0,255,100,0.08);
     max-width: 100%;
     max-height: 100%;
-
     transform: translateZ(0);
     backface-visibility: hidden;
 }
@@ -316,22 +667,13 @@ canvas {
    ================================= */
 
 #controls {
-
     position: absolute;
-
     bottom: 12px;
-
     left: 50%;
-
-    transform:
-        translateX(-50%);
-
+    transform: translateX(-50%);
     color: #555;
-
     font-size: 11px;
-
     letter-spacing: 1px;
-
     white-space: nowrap;
 }
 
@@ -344,7 +686,9 @@ canvas {
     position: absolute;
     left: 50%;
     top: 50%;
-    transform: translate(-50%, -50%) scale(0.4);
+    transform:
+        translate(-50%, -50%)
+        scale(0.4);
     z-index: 80;
     pointer-events: none;
     opacity: 0;
@@ -361,70 +705,91 @@ canvas {
     will-change: transform, opacity;
 }
 
+
 #feedbackText.show {
-    animation: feedbackPop 0.72s cubic-bezier(.16,1.35,.35,1) forwards;
+    animation:
+        feedbackPop
+        0.72s
+        cubic-bezier(.16,1.35,.35,1)
+        forwards;
 }
 
+
 @keyframes feedbackPop {
-    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.35) rotate(-8deg); }
-    18% { opacity: 1; transform: translate(-50%, -50%) scale(1.18) rotate(3deg); }
-    42% { transform: translate(-50%, -50%) scale(0.96) rotate(-2deg); }
-    68% { opacity: 1; transform: translate(-50%, -62%) scale(1) rotate(0deg); }
-    100% { opacity: 0; transform: translate(-50%, -82%) scale(0.9) rotate(0deg); }
+
+    0% {
+        opacity: 0;
+        transform:
+            translate(-50%, -50%)
+            scale(0.35)
+            rotate(-8deg);
+    }
+
+    18% {
+        opacity: 1;
+        transform:
+            translate(-50%, -50%)
+            scale(1.18)
+            rotate(3deg);
+    }
+
+    42% {
+        transform:
+            translate(-50%, -50%)
+            scale(0.96)
+            rotate(-2deg);
+    }
+
+    68% {
+        opacity: 1;
+        transform:
+            translate(-50%, -62%)
+            scale(1)
+            rotate(0deg);
+    }
+
+    100% {
+        opacity: 0;
+        transform:
+            translate(-50%, -82%)
+            scale(0.9)
+            rotate(0deg);
+    }
 }
+
 
 /* =================================
    GAME OVER
    ================================= */
 
 #gameOver {
-
     position: absolute;
-
     inset: 0;
-
     display: none;
-
     align-items: center;
-
     justify-content: center;
-
     z-index: 200;
-
     background:
         radial-gradient(
             circle,
             rgba(70,0,0,0.3),
             rgba(0,0,0,0.94)
         );
-
     backdrop-filter: blur(8px);
 }
 
 
 .gameOverBox {
-
     width: min(500px, 88vw);
-
     padding: 45px 30px;
-
     text-align: center;
-
-    border:
-        1px solid
-        rgba(255,50,50,0.35);
-
+    border: 1px solid rgba(255,50,50,0.35);
     border-radius: 25px;
-
-    background:
-        rgba(10,10,10,0.92);
-
-    box-shadow:
-        0 0 60px
-        rgba(255,0,0,0.12);
-
+    background: rgba(10,10,10,0.92);
+    box-shadow: 0 0 60px rgba(255,0,0,0.12);
     animation:
-        gameOverIn 0.55s
+        gameOverIn
+        0.55s
         cubic-bezier(.2,.8,.2,1);
 }
 
@@ -432,18 +797,14 @@ canvas {
 @keyframes gameOverIn {
 
     from {
-
         opacity: 0;
-
         transform:
             scale(0.6)
             translateY(40px);
     }
 
     to {
-
         opacity: 1;
-
         transform:
             scale(1)
             translateY(0);
@@ -452,11 +813,8 @@ canvas {
 
 
 .gameOverIcon {
-
     font-size: 55px;
-
     margin-bottom: 10px;
-
     animation:
         floatIcon 1.5s
         infinite
@@ -477,15 +835,10 @@ canvas {
 
 
 .gameOverTitle {
-
     font-size: 58px;
-
     font-weight: 900;
-
     letter-spacing: 4px;
-
     color: #ff3030;
-
     text-shadow:
         0 0 10px #ff3030,
         0 0 30px rgba(255,0,0,0.7),
@@ -494,91 +847,58 @@ canvas {
 
 
 .finalScore {
-
     margin-top: 15px;
-
     color: #777;
-
     font-size: 13px;
-
     letter-spacing: 3px;
 }
 
 
 .finalScore span {
-
     display: block;
-
     margin-top: 5px;
-
     color: white;
-
     font-size: 38px;
-
     font-weight: bold;
-
     letter-spacing: 1px;
 }
 
 
 .playAgain {
-
     margin-top: 30px;
-
     padding: 14px 38px;
-
     border: none;
-
     border-radius: 12px;
-
     background: #00dd55;
-
     color: #031108;
-
     font-size: 16px;
-
     font-weight: bold;
-
     cursor: pointer;
-
-    box-shadow:
-        0 0 20px
-        rgba(0,255,100,0.25);
-
+    box-shadow: 0 0 20px rgba(0,255,100,0.25);
     transition: 0.2s;
 }
 
 
 .playAgain:hover {
-
     transform: scale(1.07);
-
     background: #00ff66;
-
-    box-shadow:
-        0 0 35px
-        rgba(0,255,100,0.5);
+    box-shadow: 0 0 35px rgba(0,255,100,0.5);
 }
 
 
 /* =================================
-   FULLSCREEN MODE
+   FULLSCREEN
    ================================= */
 
 :fullscreen #navbar {
-
     height: 64px;
 }
 
 
 :fullscreen #gameContainer {
-
     top: 64px;
-
     width: 100vw;
-
     height: calc(100vh - 64px);
-
     height: calc(100dvh - 64px);
 }
 
@@ -590,253 +910,157 @@ canvas {
 @media (max-width: 700px) {
 
     #navbar {
-
         height: 55px;
-
         padding: 0 13px;
     }
 
-
     #gameContainer {
-
         top: 55px;
-
-        height:
-            calc(100vh - 55px);
-
-        height:
-            calc(100dvh - 55px);
+        height: calc(100vh - 55px);
+        height: calc(100dvh - 55px);
     }
 
-
     .logo {
-
         font-size: 18px;
     }
 
-
     .logoIcon {
-
         width: 32px;
         height: 32px;
-
         font-size: 20px;
     }
 
-
     #fullscreenBtn {
-
         padding: 7px 10px;
-
         font-size: 13px;
     }
 
-
     #topBar {
-
         top: 10px;
-
         padding: 0 10px;
     }
 
-
     .scoreBox {
-
         min-width: 70px;
-
         padding: 5px 10px;
     }
 
-
     .value {
-
         font-size: 18px;
     }
 
+    #heartsBox {
+        top: 10px;
+        min-width: 92px;
+        height: 34px;
+        padding: 5px 8px;
+        gap: 7px;
+    }
+
+    .heart {
+        width: 17px;
+        height: 17px;
+        font-size: 17px;
+        line-height: 17px;
+    }
+
+    #lifeFeedback {
+        top: 48px;
+        font-size: 14px;
+    }
 
     #controls {
-
         display: none;
     }
 
-
     .gameOverBox {
-
         padding: 35px 20px;
     }
 
-
     .gameOverTitle {
-
         font-size: 40px;
-
         letter-spacing: 2px;
     }
 
-
     .gameOverIcon {
-
         font-size: 45px;
     }
 }
 
 
-/* =================================
-   MOBILE FULLSCREEN
-   ================================= */
-
 @media (max-width: 700px) {
 
     :fullscreen #navbar {
-
         height: 55px;
     }
 
-
     :fullscreen #gameContainer {
-
         top: 55px;
-
         height: calc(100vh - 55px);
-
         height: calc(100dvh - 55px);
     }
 }
-
 
 </style>
 
 </head>
 
-
 <body>
-
-
-<!-- =================================
-     NAVBAR
-     ================================= -->
 
 <nav id="navbar">
 
-    <div class="logo">
+<div class="logo">
 
-        <div class="logoIcon">
-            🐍
-        </div>
-
-        <div>
-            The <span>Snake</span>
-        </div>
-
+    <div class="logoIcon">
+        🐍
     </div>
 
+    <div>
+        The <span>Snake</span>
+    </div>
 
-    <button
-        id="fullscreenBtn"
-        onclick="toggleFullscreen()"
-    >
-        ⛶ Fullscreen
-    </button>
+</div>
+
+<button
+    id="fullscreenBtn"
+    onclick="toggleFullscreen()"
+>
+    ⛶ Fullscreen
+</button>
 
 </nav>
 
-
-
-<!-- =================================
-     GAME
-     ================================= -->
-
 <div id="gameContainer">
 
+<div id="topBar">
 
-    <!-- SCORE -->
+    <div class="scoreBox">
 
-    <div id="topBar">
-
-        <div class="scoreBox">
-
-            <div class="label">
-                Score
-            </div>
-
-            <div
-                class="value"
-                id="score"
-            >
-                0
-            </div>
-
+        <div class="label">
+            Score
         </div>
 
-
-        <div class="scoreBox">
-
-            <div class="label">
-                Best
-            </div>
-
-            <div
-                class="value best"
-                id="highScore"
-            >
-                0
-            </div>
-
+        <div
+            class="value"
+            id="score"
+        >
+            0
         </div>
 
     </div>
 
 
+    <div class="scoreBox">
 
-    <!-- FEEDBACK TEXT -->
-    <div id="feedbackText"></div>
+        <div class="label">
+            Best
+        </div>
 
-    <!-- GAME CANVAS -->
-    <canvas id="game"></canvas>
-
-
-
-    <!-- DESKTOP -->
-
-    <div id="controls">
-
-        WASD / ARROW KEYS • MOVE
-
-    </div>
-
-
-
-    <!-- GAME OVER -->
-
-    <div id="gameOver">
-
-        <div class="gameOverBox">
-
-            <div class="gameOverIcon">
-                💥
-            </div>
-
-            <div class="gameOverTitle">
-                GAME OVER
-            </div>
-
-            <div class="finalScore">
-
-                FINAL SCORE
-
-                <span id="finalScore">
-                    0
-                </span>
-
-            </div>
-
-            <button
-                class="playAgain"
-                onclick="restartGame()"
-            >
-                PLAY AGAIN
-            </button>
-
+        <div
+            class="value best"
+            id="highScore"
+        >
+            0
         </div>
 
     </div>
@@ -844,6 +1068,76 @@ canvas {
 </div>
 
 
+<div id="heartsBox">
+
+    <span class="heart" id="heart1">❤️</span>
+
+    <span class="heart" id="heart2">❤️</span>
+
+    <span class="heart" id="heart3">❤️</span>
+
+</div>
+
+
+<div id="lifeFeedback"></div>
+
+
+<!-- BIG DEATH HEART -->
+
+<div id="deathHeartOverlay">
+
+    <div id="deathHeart"></div>
+
+    <div id="deathCrack"></div>
+
+</div>
+
+
+<div id="feedbackText"></div>
+
+
+<canvas id="game"></canvas>
+
+
+<div id="controls">
+    WASD / ARROW KEYS • MOVE
+</div>
+
+
+<div id="gameOver">
+
+    <div class="gameOverBox">
+
+        <div class="gameOverIcon">
+            💥
+        </div>
+
+        <div class="gameOverTitle">
+            GAME OVER
+        </div>
+
+        <div class="finalScore">
+
+            FINAL SCORE
+
+            <span id="finalScore">
+                0
+            </span>
+
+        </div>
+
+        <button
+            class="playAgain"
+            onclick="restartGame()"
+        >
+            PLAY AGAIN
+        </button>
+
+    </div>
+
+</div>
+
+</div>
 
 <script>
 
@@ -885,6 +1179,25 @@ const finalScore =
 const feedbackText =
     document.getElementById("feedbackText");
 
+const lifeFeedback =
+    document.getElementById("lifeFeedback");
+
+const deathHeartOverlay =
+    document.getElementById(
+        "deathHeartOverlay"
+    );
+
+
+const heartElements = [
+
+    document.getElementById("heart1"),
+
+    document.getElementById("heart2"),
+
+    document.getElementById("heart3")
+
+];
+
 
 /* =================================
    GAME SETTINGS
@@ -895,6 +1208,7 @@ const GRID = 32;
 let tileSize;
 
 let backgroundCache = null;
+
 let backgroundCacheSize = 0;
 
 let snake;
@@ -920,16 +1234,51 @@ let gameSpeed = 115;
 
 let lastTime = 0;
 
+let lastRenderTime = 0;
+
+const renderInterval =
+    1000 / 30;
+
 let animationFrameId = null;
 
 let audioContext = null;
+
 let audioMaster = null;
+
 let feedbackTimer = null;
+
 let gameOverTimeout = null;
+
 let frameScale = 1;
 
+
+/* =================================
+   HEART SYSTEM
+   ================================= */
+
+const MAX_HEARTS = 3;
+
+let hearts = MAX_HEARTS;
+
+let heartItem = null;
+
+let heartParticles = [];
+
+let heartAnimationTime = 0;
+
+let heartSpawnScore = 5;
+
+let heartSpawnCooldown = 0;
+
+
+/* =================================
+   AUDIO
+   ================================= */
+
 function initAudio() {
+
     if (!audioContext) {
+
         const AudioCtx =
             window.AudioContext ||
             window.webkitAudioContext;
@@ -937,11 +1286,15 @@ function initAudio() {
         if (!AudioCtx)
             return;
 
-        audioContext = new AudioCtx();
+        audioContext =
+            new AudioCtx();
+
         audioMaster =
             audioContext.createGain();
 
-        audioMaster.gain.value = 0.16;
+        audioMaster.gain.value =
+            0.16;
+
         audioMaster.connect(
             audioContext.destination
         );
@@ -949,11 +1302,14 @@ function initAudio() {
 
     if (
         audioContext &&
-        audioContext.state === "suspended"
+        audioContext.state ===
+        "suspended"
     ) {
+
         audioContext.resume();
     }
 }
+
 
 function tone(
     frequency,
@@ -962,10 +1318,15 @@ function tone(
     volume = 0.08,
     slideTo = null
 ) {
+
     initAudio();
 
-    if (!audioContext || !audioMaster)
+    if (
+        !audioContext ||
+        !audioMaster
+    ) {
         return;
+    }
 
     const now =
         audioContext.currentTime;
@@ -976,17 +1337,27 @@ function tone(
     const gain =
         audioContext.createGain();
 
-    oscillator.type = type;
-    oscillator.frequency.setValueAtTime(
-        frequency,
-        now
-    );
+    oscillator.type =
+        type;
 
-    if (slideTo !== null) {
-        oscillator.frequency.exponentialRampToValueAtTime(
-            Math.max(25, slideTo),
-            now + duration
+    oscillator.frequency
+        .setValueAtTime(
+            frequency,
+            now
         );
+
+    if (
+        slideTo !== null
+    ) {
+
+        oscillator.frequency
+            .exponentialRampToValueAtTime(
+                Math.max(
+                    25,
+                    slideTo
+                ),
+                now + duration
+            );
     }
 
     gain.gain.setValueAtTime(
@@ -994,26 +1365,152 @@ function tone(
         now
     );
 
-    gain.gain.exponentialRampToValueAtTime(
-        volume,
-        now + 0.008
-    );
+    gain.gain
+        .exponentialRampToValueAtTime(
+            volume,
+            now + 0.008
+        );
 
-    gain.gain.exponentialRampToValueAtTime(
-        0.0001,
-        now + duration
-    );
+    gain.gain
+        .exponentialRampToValueAtTime(
+            0.0001,
+            now + duration
+        );
 
     oscillator.connect(gain);
-    gain.connect(audioMaster);
+
+    gain.connect(
+        audioMaster
+    );
 
     oscillator.start(now);
+
     oscillator.stop(
         now + duration + 0.015
     );
 }
 
+
+/* =================================
+   HEART DEATH SOUND
+   ================================= */
+
+function playHeartBreakSound() {
+
+    initAudio();
+
+    if (!audioContext)
+        return;
+
+    tone(
+        240,
+        0.16,
+        "sawtooth",
+        0.13,
+        105
+    );
+
+    setTimeout(
+        () =>
+            tone(
+                145,
+                0.20,
+                "triangle",
+                0.12,
+                55
+            ),
+        80
+    );
+
+    setTimeout(
+        () =>
+            tone(
+                75,
+                0.34,
+                "sawtooth",
+                0.09,
+                30
+            ),
+        170
+    );
+
+    setTimeout(
+        () =>
+            tone(
+                430,
+                0.06,
+                "square",
+                0.045,
+                180
+            ),
+        215
+    );
+}
+
+
+/* =================================
+   HEART COLLECT SOUND
+   ================================= */
+
+function playHeartPowerupSound() {
+
+    initAudio();
+
+    if (!audioContext)
+        return;
+
+    tone(
+        440,
+        0.08,
+        "sine",
+        0.065,
+        660
+    );
+
+    setTimeout(
+        () =>
+            tone(
+                660,
+                0.09,
+                "triangle",
+                0.075,
+                880
+            ),
+        55
+    );
+
+    setTimeout(
+        () =>
+            tone(
+                880,
+                0.10,
+                "triangle",
+                0.085,
+                1180
+            ),
+        115
+    );
+
+    setTimeout(
+        () =>
+            tone(
+                1180,
+                0.18,
+                "sine",
+                0.06,
+                1550
+            ),
+        175
+    );
+}
+
+
+/* =================================
+   EXPLOSION SOUND
+   ================================= */
+
 function playExplosionSound() {
+
     initAudio();
 
     if (!audioContext)
@@ -1036,7 +1533,13 @@ function playExplosionSound() {
     );
 }
 
+
+/* =================================
+   LOSE SOUND
+   ================================= */
+
 function playLoseSound() {
+
     initAudio();
 
     if (!audioContext)
@@ -1075,7 +1578,89 @@ function playLoseSound() {
     );
 }
 
+
+/* =================================
+   HEART LOSE SOUND
+   ================================= */
+
+function playHeartLoseSound() {
+
+    initAudio();
+
+    if (!audioContext)
+        return;
+
+    tone(
+        310,
+        0.11,
+        "triangle",
+        0.075,
+        190
+    );
+
+    setTimeout(
+        () =>
+            tone(
+                180,
+                0.16,
+                "triangle",
+                0.065,
+                90
+            ),
+        85
+    );
+}
+
+
+/* =================================
+   HEART COLLECT SOUND
+   ================================= */
+
+function playHeartCollectSound() {
+
+    playHeartPowerupSound();
+}
+
+
+/* =================================
+   HEART SPAWN SOUND
+   ================================= */
+
+function playHeartSpawnSound() {
+
+    initAudio();
+
+    if (!audioContext)
+        return;
+
+    tone(
+        360,
+        0.10,
+        "sine",
+        0.045,
+        520
+    );
+
+    setTimeout(
+        () =>
+            tone(
+                520,
+                0.13,
+                "sine",
+                0.05,
+                720
+            ),
+        80
+    );
+}
+
+
+/* =================================
+   EAT SOUND
+   ================================= */
+
 const eatSoundPatterns = [
+
     [660, 880],
     [523, 784],
     [740, 988],
@@ -1084,11 +1669,14 @@ const eatSoundPatterns = [
     [494, 740],
     [622, 932],
     [784, 1175]
+
 ];
 
 let eatSoundIndex = 0;
 
+
 function playEatSound() {
+
     const pattern =
         eatSoundPatterns[
             eatSoundIndex %
@@ -1117,7 +1705,13 @@ function playEatSound() {
     );
 }
 
+
+/* =================================
+   FEEDBACK
+   ================================= */
+
 const feedbackWords = [
+
     "AMAZING!",
     "AWESOME!",
     "NICE!",
@@ -1126,11 +1720,14 @@ const feedbackWords = [
     "DELICIOUS!",
     "WOW!",
     "PERFECT!"
+
 ];
 
 let feedbackIndex = 0;
 
+
 function showFeedback() {
+
     const word =
         feedbackWords[
             feedbackIndex %
@@ -1139,26 +1736,197 @@ function showFeedback() {
 
     feedbackIndex++;
 
-    feedbackText.textContent = word;
+    feedbackText.textContent =
+        word;
+
     feedbackText.style.color =
         currentFruit.color;
 
-    feedbackText.classList.remove("show");
+    feedbackText.classList.remove(
+        "show"
+    );
 
     void feedbackText.offsetWidth;
 
-    feedbackText.classList.add("show");
+    feedbackText.classList.add(
+        "show"
+    );
 
     if (feedbackTimer)
-        clearTimeout(feedbackTimer);
+        clearTimeout(
+            feedbackTimer
+        );
 
     feedbackTimer =
         setTimeout(
             () => {
-                feedbackText.classList.remove("show");
+
+                feedbackText
+                    .classList
+                    .remove("show");
+
             },
             760
         );
+}
+
+
+/* =================================
+   LIFE FEEDBACK
+   ================================= */
+
+function showLifeFeedback(
+    text
+) {
+
+    lifeFeedback.textContent =
+        text;
+
+    lifeFeedback.classList
+        .remove("show");
+
+    void lifeFeedback.offsetWidth;
+
+    lifeFeedback.classList
+        .add("show");
+}
+
+
+/* =================================
+   DEATH HEART ANIMATION
+   ================================= */
+
+function showDeathHeart() {
+
+    deathHeartOverlay.classList
+        .remove("show");
+
+    void deathHeartOverlay.offsetWidth;
+
+    deathHeartOverlay.classList
+        .add("show");
+
+    playHeartBreakSound();
+
+    setTimeout(
+        () => {
+
+            deathHeartOverlay.classList
+                .remove("show");
+
+        },
+        1350
+    );
+}
+
+
+/* =================================
+   UPDATE HEART UI
+   ================================= */
+
+function updateHeartUI(
+    animateIndex = -1,
+    animationClass = ""
+) {
+
+    heartElements.forEach(
+        (element, index) => {
+
+            element.classList.remove(
+                "empty",
+                "losing",
+                "gaining"
+            );
+
+            if (
+                index >= hearts
+            ) {
+
+                element.classList.add(
+                    "empty"
+                );
+            }
+
+            if (
+                index === animateIndex &&
+                animationClass
+            ) {
+
+                void element.offsetWidth;
+
+                element.classList.add(
+                    animationClass
+                );
+            }
+        }
+    );
+}
+
+
+/* =================================
+   REMOVE HEART
+   ================================= */
+
+function loseHeart() {
+
+    if (
+        hearts <= 0
+    ) {
+        return;
+    }
+
+    const lostIndex =
+        hearts - 1;
+
+    hearts--;
+
+    updateHeartUI(
+        lostIndex,
+        "losing"
+    );
+
+    playHeartLoseSound();
+
+    showLifeFeedback(
+        "−1 LIFE"
+    );
+
+    showDeathHeart();
+}
+
+
+/* =================================
+   ADD HEART
+   ================================= */
+
+function gainHeart() {
+
+    if (
+        hearts >= MAX_HEARTS
+    ) {
+
+        showLifeFeedback(
+            "FULL LIVES"
+        );
+
+        return;
+    }
+
+    const gainedIndex =
+        hearts;
+
+    hearts++;
+
+    updateHeartUI(
+        gainedIndex,
+        "gaining"
+    );
+
+    playHeartPowerupSound();
+
+    showLifeFeedback(
+        "+1 LIFE"
+    );
 }
 
 
@@ -1282,13 +2050,17 @@ let obstacleFlash = 0;
 document.addEventListener(
     "pointerdown",
     initAudio,
-    { passive: true }
+    {
+        passive: true
+    }
 );
 
 document.addEventListener(
     "keydown",
     initAudio,
-    { passive: true }
+    {
+        passive: true
+    }
 );
 
 
@@ -1297,16 +2069,23 @@ document.addEventListener(
    ================================= */
 
 let touchStartX = 0;
+
 let touchStartY = 0;
+
 let touchActive = false;
+
 let touchDirectionLocked = false;
+
 let touchPointerId = null;
+
 
 canvas.addEventListener(
     "pointerdown",
     event => {
 
-        if (event.pointerType !== "touch") {
+        if (
+            event.pointerType !== "touch"
+        ) {
             return;
         }
 
@@ -1314,20 +2093,35 @@ canvas.addEventListener(
             return;
         }
 
-        touchStartX = event.clientX;
-        touchStartY = event.clientY;
+        touchStartX =
+            event.clientX;
+
+        touchStartY =
+            event.clientY;
+
         touchActive = true;
-        touchDirectionLocked = false;
-        touchPointerId = event.pointerId;
+
+        touchDirectionLocked =
+            false;
+
+        touchPointerId =
+            event.pointerId;
 
         try {
-            canvas.setPointerCapture(event.pointerId);
+
+            canvas.setPointerCapture(
+                event.pointerId
+            );
+
         } catch (error) {}
 
         event.preventDefault();
     },
-    { passive: false }
+    {
+        passive: false
+    }
 );
+
 
 canvas.addEventListener(
     "pointerup",
@@ -1336,61 +2130,97 @@ canvas.addEventListener(
         if (
             event.pointerType !== "touch" ||
             !touchActive ||
-            event.pointerId !== touchPointerId
+            event.pointerId !==
+                touchPointerId
         ) {
             return;
         }
 
         const deltaX =
-            event.clientX - touchStartX;
+            event.clientX -
+            touchStartX;
 
         const deltaY =
-            event.clientY - touchStartY;
+            event.clientY -
+            touchStartY;
 
         touchActive = false;
+
         touchPointerId = null;
 
         try {
-            canvas.releasePointerCapture(event.pointerId);
+
+            canvas.releasePointerCapture(
+                event.pointerId
+            );
+
         } catch (error) {}
 
-        const minSwipeDistance = 25;
+        const minSwipeDistance =
+            25;
 
         if (
-            Math.abs(deltaX) < minSwipeDistance &&
-            Math.abs(deltaY) < minSwipeDistance
+            Math.abs(deltaX) <
+                minSwipeDistance &&
+            Math.abs(deltaY) <
+                minSwipeDistance
         ) {
+
             event.preventDefault();
+
             return;
         }
 
-        if (touchDirectionLocked) {
+        if (
+            touchDirectionLocked
+        ) {
+
             event.preventDefault();
+
             return;
         }
 
-        if (Math.abs(deltaX) > Math.abs(deltaY)) {
+        if (
+            Math.abs(deltaX) >
+            Math.abs(deltaY)
+        ) {
 
-            if (deltaX > 0) {
+            if (
+                deltaX > 0
+            ) {
+
                 setDirection(1, 0);
+
             } else {
+
                 setDirection(-1, 0);
             }
 
         } else {
 
-            if (deltaY > 0) {
+            if (
+                deltaY > 0
+            ) {
+
                 setDirection(0, 1);
+
             } else {
+
                 setDirection(0, -1);
             }
         }
 
-        touchDirectionLocked = true;
+        touchDirectionLocked =
+            true;
+
         event.preventDefault();
+
     },
-    { passive: false }
+    {
+        passive: false
+    }
 );
+
 
 canvas.addEventListener(
     "pointercancel",
@@ -1404,24 +2234,38 @@ canvas.addEventListener(
         }
 
         touchActive = false;
-        touchDirectionLocked = false;
+
+        touchDirectionLocked =
+            false;
+
         touchPointerId = null;
+
     },
-    { passive: true }
+    {
+        passive: true
+    }
 );
+
 
 canvas.addEventListener(
     "lostpointercapture",
     event => {
 
-        if (event.pointerId !== touchPointerId) {
+        if (
+            event.pointerId !==
+            touchPointerId
+        ) {
             return;
         }
 
         touchActive = false;
+
         touchPointerId = null;
+
     },
-    { passive: true }
+    {
+        passive: true
+    }
 );
 
 
@@ -1468,7 +2312,6 @@ function resizeCanvas() {
     let height =
         window.innerHeight - 8;
 
-
     if (
         window.matchMedia(
             "(max-width: 700px)"
@@ -1486,13 +2329,11 @@ function resizeCanvas() {
             8;
     }
 
-
     const size =
         Math.min(
             width,
             height
         );
-
 
     const newSize =
         Math.max(
@@ -1503,20 +2344,29 @@ function resizeCanvas() {
         );
 
     if (
-        canvas.width === newSize &&
-        canvas.height === newSize
+        canvas.width ===
+            newSize &&
+        canvas.height ===
+            newSize
     ) {
         return;
     }
 
-    canvas.width = newSize;
-    canvas.height = newSize;
+    canvas.width =
+        newSize;
+
+    canvas.height =
+        newSize;
 
     tileSize =
-        canvas.width / GRID;
+        canvas.width /
+        GRID;
 
-    backgroundCache = null;
-    backgroundCacheSize = 0;
+    backgroundCache =
+        null;
+
+    backgroundCacheSize =
+        0;
 }
 
 
@@ -1527,12 +2377,20 @@ function resizeCanvas() {
 function startGame() {
 
     if (gameOverTimeout) {
-        clearTimeout(gameOverTimeout);
+
+        clearTimeout(
+            gameOverTimeout
+        );
+
         gameOverTimeout = null;
     }
 
     if (feedbackTimer) {
-        clearTimeout(feedbackTimer);
+
+        clearTimeout(
+            feedbackTimer
+        );
+
         feedbackTimer = null;
     }
 
@@ -1547,42 +2405,27 @@ function startGame() {
         animationFrameId = null;
     }
 
+    deathHeartOverlay.classList
+        .remove("show");
 
     snake = [
 
-        {
-            x: 16,
-            y: 16
-        },
+        { x: 16, y: 16 },
+        { x: 15, y: 16 },
+        { x: 14, y: 16 },
+        { x: 13, y: 16 }
 
-        {
-            x: 15,
-            y: 16
-        },
-
-        {
-            x: 14,
-            y: 16
-        },
-
-        {
-            x: 13,
-            y: 16
-        }
     ];
-
 
     direction = {
         x: 1,
         y: 0
     };
 
-
     nextDirection = {
         x: 1,
         y: 0
     };
-
 
     score = 0;
 
@@ -1593,11 +2436,15 @@ function startGame() {
     lastTime =
         performance.now();
 
+    lastRenderTime = 0;
+
     particles = [];
 
     foodParticles = [];
 
     obstacleParticles = [];
+
+    heartParticles = [];
 
     obstacles = [];
 
@@ -1619,13 +2466,32 @@ function startGame() {
 
     gameOverReady = false;
 
-    feedbackText.classList.remove("show");
+    hearts = MAX_HEARTS;
+
+    heartItem = null;
+
+    heartAnimationTime = 0;
+
+    heartSpawnScore = 5;
+
+    heartSpawnCooldown = 0;
+
+    updateHeartUI();
+
+    feedbackText.classList.remove(
+        "show"
+    );
+
     feedbackText.textContent = "";
 
+    lifeFeedback.classList.remove(
+        "show"
+    );
+
+    lifeFeedback.textContent = "";
 
     currentSnakeColor =
         snakeColors[0];
-
 
     currentFruit =
         fruits[
@@ -1635,17 +2501,79 @@ function startGame() {
             )
         ];
 
-
     scoreElement.textContent =
         score;
-
 
     gameOver.style.display =
         "none";
 
-
     spawnFood();
 
+    animationFrameId =
+        requestAnimationFrame(
+            gameLoop
+        );
+}
+
+
+/* =================================
+   RESPAWN AFTER DEATH
+   ================================= */
+
+function respawnAfterDeath() {
+
+    if (
+        hearts <= 0
+    ) {
+        return;
+    }
+
+    snake = [
+
+        { x: 16, y: 16 },
+        { x: 15, y: 16 },
+        { x: 14, y: 16 },
+        { x: 13, y: 16 }
+
+    ];
+
+    direction = {
+        x: 1,
+        y: 0
+    };
+
+    nextDirection = {
+        x: 1,
+        y: 0
+    };
+
+    deathAnimation = false;
+
+    deathTimer = 0;
+
+    screenShake = 0;
+
+    redFlash = 0;
+
+    particles = [];
+
+    foodParticles = [];
+
+    gameRunning = true;
+
+    lastTime =
+        performance.now();
+
+    lastRenderTime = 0;
+
+    touchActive = false;
+
+    touchDirectionLocked =
+        false;
+
+    touchPointerId = null;
+
+    placeFoodSafely();
 
     animationFrameId =
         requestAnimationFrame(
@@ -1665,15 +2593,21 @@ function restartGame() {
 
 
 /* =================================
-   FOOD
+   SAFE FOOD POSITION
    ================================= */
 
-function spawnFood() {
+function placeFoodSafely() {
 
     let valid = false;
 
+    let attempts = 0;
 
-    while (!valid) {
+    while (
+        !valid &&
+        attempts < 500
+    ) {
+
+        attempts++;
 
         food = {
 
@@ -1688,8 +2622,8 @@ function spawnFood() {
                     Math.random() *
                     (GRID - 4)
                 ) + 2
-        };
 
+        };
 
         valid =
             !snake.some(
@@ -1697,7 +2631,6 @@ function spawnFood() {
                     part.x === food.x &&
                     part.y === food.y
             );
-
 
         if (valid) {
 
@@ -1708,8 +2641,37 @@ function spawnFood() {
                         obstacle.y === food.y
                 );
         }
+
+        if (
+            valid &&
+            heartItem
+        ) {
+
+            valid =
+                !(
+                    heartItem.x === food.x &&
+                    heartItem.y === food.y
+                );
+        }
     }
 
+    if (!valid) {
+
+        food = {
+            x: 5,
+            y: 5
+        };
+    }
+}
+
+
+/* =================================
+   FOOD
+   ================================= */
+
+function spawnFood() {
+
+    placeFoodSafely();
 
     let nextFruit;
 
@@ -1724,18 +2686,528 @@ function spawnFood() {
             ];
 
     } while (
-
         fruits.length > 1 &&
-        nextFruit.type === currentFruit.type
-
+        nextFruit.type ===
+            currentFruit.type
     );
-
 
     currentFruit =
         nextFruit;
 
-
     foodPulse = 0;
+}
+
+
+/* =================================
+   HEART POSITION
+   ================================= */
+
+function spawnHeart() {
+
+    if (heartItem)
+        return;
+
+    if (hearts >= MAX_HEARTS)
+        return;
+
+    let valid = false;
+
+    let candidate;
+
+    let attempts = 0;
+
+    while (
+        !valid &&
+        attempts < 700
+    ) {
+
+        attempts++;
+
+        candidate = {
+
+            x:
+                Math.floor(
+                    Math.random() *
+                    (GRID - 6)
+                ) + 3,
+
+            y:
+                Math.floor(
+                    Math.random() *
+                    (GRID - 6)
+                ) + 3
+
+        };
+
+        valid =
+            !snake.some(
+                part =>
+                    part.x ===
+                        candidate.x &&
+                    part.y ===
+                        candidate.y
+            );
+
+        if (
+            valid &&
+            food
+        ) {
+
+            valid =
+                !(
+                    candidate.x ===
+                        food.x &&
+                    candidate.y ===
+                        food.y
+                );
+        }
+
+        if (valid) {
+
+            valid =
+                !obstacles.some(
+                    obstacle =>
+                        obstacle.x ===
+                            candidate.x &&
+                        obstacle.y ===
+                            candidate.y
+                );
+        }
+
+        if (
+            valid &&
+            snake[0]
+        ) {
+
+            const distance =
+                Math.abs(
+                    candidate.x -
+                    snake[0].x
+                ) +
+                Math.abs(
+                    candidate.y -
+                    snake[0].y
+                );
+
+            if (
+                distance < 10
+            ) {
+                valid = false;
+            }
+        }
+    }
+
+    if (!valid)
+        return;
+
+    heartItem = {
+
+        x: candidate.x,
+
+        y: candidate.y,
+
+        age: 0,
+
+        pulse: 0
+
+    };
+
+    heartAnimationTime = 0;
+
+    heartParticles = [];
+
+    createHeartSpawnEffect(
+        candidate.x,
+        candidate.y
+    );
+
+    playHeartSpawnSound();
+}
+
+
+/* =================================
+   HEART SPAWN EFFECT
+   ================================= */
+
+function createHeartSpawnEffect(
+    x,
+    y
+) {
+
+    const centerX =
+        x * tileSize +
+        tileSize / 2;
+
+    const centerY =
+        y * tileSize +
+        tileSize / 2;
+
+    for (
+        let i = 0;
+        i < 22;
+        i++
+    ) {
+
+        const angle =
+            Math.random() *
+            Math.PI * 2;
+
+        const speed =
+            Math.random() *
+            2.8 +
+            1.2;
+
+        heartParticles.push({
+
+            x: centerX,
+
+            y: centerY,
+
+            vx:
+                Math.cos(angle) *
+                speed,
+
+            vy:
+                Math.sin(angle) *
+                speed,
+
+            size:
+                Math.random() *
+                3.5 +
+                1.5,
+
+            life: 1,
+
+            color:
+                Math.random() >
+                0.45
+                    ? "#ff4966"
+                    : "#ff8aa0"
+
+        });
+    }
+}
+
+
+/* =================================
+   HEART COLLECT EFFECT
+   ================================= */
+
+function createHeartCollectEffect(
+    x,
+    y
+) {
+
+    const centerX =
+        x * tileSize +
+        tileSize / 2;
+
+    const centerY =
+        y * tileSize +
+        tileSize / 2;
+
+    for (
+        let i = 0;
+        i < 60;
+        i++
+    ) {
+
+        const angle =
+            Math.random() *
+            Math.PI * 2;
+
+        const speed =
+            Math.random() *
+            8 +
+            2;
+
+        heartParticles.push({
+
+            x: centerX,
+
+            y: centerY,
+
+            vx:
+                Math.cos(angle) *
+                speed,
+
+            vy:
+                Math.sin(angle) *
+                speed,
+
+            size:
+                Math.random() *
+                7 +
+                2,
+
+            life: 1,
+
+            color:
+                Math.random() >
+                0.45
+                    ? "#ff4966"
+                    : Math.random() >
+                        0.5
+                            ? "#ffffff"
+                            : "#ffb3c0"
+
+        });
+    }
+
+    screenShake = 5;
+
+    eatColorEffect = 1;
+}
+
+
+/* =================================
+   UPDATE HEART PARTICLES
+   ================================= */
+
+function updateHeartParticles() {
+
+    heartParticles.forEach(
+        particle => {
+
+            particle.x +=
+                particle.vx;
+
+            particle.y +=
+                particle.vy;
+
+            particle.vx *=
+                0.95;
+
+            particle.vy *=
+                0.95;
+
+            particle.vy +=
+                0.035;
+
+            particle.life -=
+                0.032;
+
+            particle.size *=
+                0.975;
+
+        }
+    );
+
+    heartParticles =
+        heartParticles.filter(
+            particle =>
+                particle.life > 0
+        );
+}
+
+
+/* =================================
+   DRAW HEART
+   ================================= */
+
+function drawHeartItem() {
+
+    if (
+        !heartItem ||
+        deathAnimation
+    ) {
+        return;
+    }
+
+    const x =
+        heartItem.x *
+        tileSize +
+        tileSize / 2;
+
+    const y =
+        heartItem.y *
+        tileSize +
+        tileSize / 2;
+
+    heartItem.pulse +=
+        frameScale *
+        0.11;
+
+    heartItem.age +=
+        frameScale;
+
+    const pulse =
+        1 +
+        Math.sin(
+            heartItem.pulse
+        ) *
+        0.13;
+
+    const floatY =
+        Math.sin(
+            heartItem.pulse *
+            0.65
+        ) *
+        tileSize *
+        0.08;
+
+    const scale =
+        pulse *
+        Math.min(
+            1,
+            heartItem.age / 12
+        );
+
+    ctx.save();
+
+    ctx.translate(
+        x,
+        y + floatY
+    );
+
+    ctx.scale(
+        scale,
+        scale
+    );
+
+    ctx.shadowBlur =
+        28;
+
+    ctx.shadowColor =
+        "#ff4966";
+
+    ctx.fillStyle =
+        "#ff4966";
+
+    ctx.beginPath();
+
+    const s =
+        tileSize *
+        0.32;
+
+    ctx.moveTo(
+        0,
+        s * 0.85
+    );
+
+    ctx.bezierCurveTo(
+        -s * 1.25,
+        s * 0.05,
+        -s * 0.78,
+        -s * 0.85,
+        0,
+        -s * 0.35
+    );
+
+    ctx.bezierCurveTo(
+        s * 0.78,
+        -s * 0.85,
+        s * 1.25,
+        s * 0.05,
+        0,
+        s * 0.85
+    );
+
+    ctx.fill();
+
+    ctx.shadowBlur =
+        0;
+
+    ctx.fillStyle =
+        "rgba(255,255,255,0.78)";
+
+    ctx.beginPath();
+
+    ctx.arc(
+        -s * 0.32,
+        -s * 0.28,
+        s * 0.12,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fill();
+
+    ctx.restore();
+}
+
+
+/* =================================
+   DRAW HEART PARTICLES
+   ================================= */
+
+function drawHeartParticles() {
+
+    heartParticles.forEach(
+        particle => {
+
+            ctx.globalAlpha =
+                particle.life;
+
+            ctx.fillStyle =
+                particle.color;
+
+            ctx.shadowBlur =
+                15;
+
+            ctx.shadowColor =
+                particle.color;
+
+            ctx.beginPath();
+
+            ctx.arc(
+                particle.x,
+                particle.y,
+                particle.size,
+                0,
+                Math.PI * 2
+            );
+
+            ctx.fill();
+
+        }
+    );
+
+    ctx.globalAlpha = 1;
+
+    ctx.shadowBlur = 0;
+}
+
+
+/* =================================
+   CHECK HEART
+   ================================= */
+
+function checkHeartCollision(
+    head
+) {
+
+    if (!heartItem)
+        return false;
+
+    return (
+        heartItem.x ===
+            head.x &&
+        heartItem.y ===
+            head.y
+    );
+}
+
+
+/* =================================
+   HEART SPAWN CONTROL
+   ================================= */
+
+function checkHeartSpawn() {
+
+    if (heartItem)
+        return;
+
+    if (hearts >= MAX_HEARTS)
+        return;
+
+    if (score < heartSpawnScore)
+        return;
+
+    spawnHeart();
+
+    heartSpawnScore =
+        score + 5;
 }
 
 
@@ -1760,13 +3232,11 @@ function addObstacle() {
         return;
     }
 
-
     let valid = false;
 
     let newObstacle;
 
     let attempts = 0;
-
 
     while (
         !valid &&
@@ -1774,7 +3244,6 @@ function addObstacle() {
     ) {
 
         attempts++;
-
 
         newObstacle = {
 
@@ -1789,16 +3258,17 @@ function addObstacle() {
                     Math.random() *
                     (GRID - 4)
                 ) + 2
-        };
 
+        };
 
         valid =
             !snake.some(
                 part =>
-                    part.x === newObstacle.x &&
-                    part.y === newObstacle.y
+                    part.x ===
+                        newObstacle.x &&
+                    part.y ===
+                        newObstacle.y
             );
-
 
         if (
             valid &&
@@ -1807,22 +3277,38 @@ function addObstacle() {
 
             valid =
                 !(
-                    newObstacle.x === food.x &&
-                    newObstacle.y === food.y
+                    newObstacle.x ===
+                        food.x &&
+                    newObstacle.y ===
+                        food.y
                 );
         }
 
+        if (
+            valid &&
+            heartItem
+        ) {
+
+            valid =
+                !(
+                    newObstacle.x ===
+                        heartItem.x &&
+                    newObstacle.y ===
+                        heartItem.y
+                );
+        }
 
         if (valid) {
 
             valid =
                 !obstacles.some(
                     obstacle =>
-                        obstacle.x === newObstacle.x &&
-                        obstacle.y === newObstacle.y
+                        obstacle.x ===
+                            newObstacle.x &&
+                        obstacle.y ===
+                            newObstacle.y
                 );
         }
-
 
         if (
             valid &&
@@ -1839,28 +3325,22 @@ function addObstacle() {
                     snake[0].y
                 );
 
-
             if (
                 distance < 4
             ) {
-
                 valid = false;
             }
         }
     }
 
-
     if (!valid)
         return;
-
 
     obstacles.push(
         newObstacle
     );
 
-
     obstacleCount++;
-
 
     createObstacleAppearEffect(
         newObstacle.x,
@@ -1886,7 +3366,6 @@ function createObstacleAppearEffect(
         y * tileSize +
         tileSize / 2;
 
-
     for (
         let i = 0;
         i < 18;
@@ -1898,8 +3377,9 @@ function createObstacleAppearEffect(
             Math.PI * 2;
 
         const speed =
-            Math.random() * 3 + 1;
-
+            Math.random() *
+            3 +
+            1;
 
         obstacleParticles.push({
 
@@ -1916,12 +3396,15 @@ function createObstacleAppearEffect(
                 speed,
 
             size:
-                Math.random() * 4 + 2,
+                Math.random() *
+                4 +
+                2,
 
             life: 1,
 
             color:
                 "#ff8c00"
+
         });
     }
 }
@@ -1935,21 +3418,18 @@ function createObstacleExplosion(
     obstacle
 ) {
 
-    const centerX =
-        obstacle.x * tileSize +
-        tileSize / 2;
+    /*
+       IMPORTANT:
+       Do NOT activate deathAnimation here.
+       die("bomb") must continue normally so
+       the life system and respawn system work.
+    */
 
-    const centerY =
-        obstacle.y * tileSize +
-        tileSize / 2;
-
-
-    screenShake = 16;
+    screenShake = 20;
 
     obstacleFlash = 1;
 
     playExplosionSound();
-
 
     for (
         let i = 0;
@@ -1962,14 +3442,21 @@ function createObstacleExplosion(
             Math.PI * 2;
 
         const speed =
-            Math.random() * 8 + 2;
-
+            Math.random() *
+            8 +
+            2;
 
         obstacleParticles.push({
 
-            x: centerX,
+            x:
+                obstacle.x *
+                tileSize +
+                tileSize / 2,
 
-            y: centerY,
+            y:
+                obstacle.y *
+                tileSize +
+                tileSize / 2,
 
             vx:
                 Math.cos(angle) *
@@ -1980,7 +3467,9 @@ function createObstacleExplosion(
                 speed,
 
             size:
-                Math.random() * 7 + 2,
+                Math.random() *
+                7 +
+                2,
 
             life: 1,
 
@@ -1988,6 +3477,7 @@ function createObstacleExplosion(
                 Math.random() > 0.5
                     ? "#ff3030"
                     : "#ff9f00"
+
         });
     }
 }
@@ -2003,8 +3493,10 @@ function checkObstacleCollision(
 
     return obstacles.some(
         obstacle =>
-            obstacle.x === head.x &&
-            obstacle.y === head.y
+            obstacle.x ===
+                head.x &&
+            obstacle.y ===
+                head.y
     );
 }
 
@@ -2021,7 +3513,6 @@ function drawObstacles() {
         return;
     }
 
-
     obstacles.forEach(
         obstacle => {
 
@@ -2035,41 +3526,32 @@ function drawObstacles() {
                 tileSize +
                 tileSize / 2;
 
-
             const size =
                 tileSize * 0.62;
 
-
             ctx.save();
-
 
             ctx.translate(
                 x,
                 y
             );
 
-
             ctx.rotate(
                 Math.PI / 4
             );
-
 
             ctx.shadowBlur = 18;
 
             ctx.shadowColor =
                 "#ff3030";
 
-
             ctx.fillStyle =
                 "#161616";
-
 
             ctx.strokeStyle =
                 "#ff3030";
 
-
             ctx.lineWidth = 2;
-
 
             ctx.beginPath();
 
@@ -2085,15 +3567,12 @@ function drawObstacles() {
 
             ctx.stroke();
 
-
             ctx.shadowBlur = 0;
-
 
             ctx.strokeStyle =
                 "#ff9f00";
 
             ctx.lineWidth = 2;
-
 
             ctx.beginPath();
 
@@ -2114,8 +3593,8 @@ function drawObstacles() {
 
             ctx.stroke();
 
-
             ctx.restore();
+
         }
     );
 }
@@ -2138,7 +3617,6 @@ function createEatEffect(
         y * tileSize +
         tileSize / 2;
 
-
     for (
         let i = 0;
         i < 30;
@@ -2150,8 +3628,9 @@ function createEatEffect(
             Math.PI * 2;
 
         const speed =
-            Math.random() * 5 + 2;
-
+            Math.random() *
+            5 +
+            2;
 
         foodParticles.push({
 
@@ -2168,15 +3647,17 @@ function createEatEffect(
                 speed,
 
             size:
-                Math.random() * 5 + 2,
+                Math.random() *
+                5 +
+                2,
 
             life: 1,
 
             color:
                 currentFruit.color
+
         });
     }
-
 
     eatColorEffect = 1;
 }
@@ -2196,53 +3677,59 @@ function createDeathExplosion() {
 
     redFlash = 1;
 
+    snake.forEach(
+        part => {
 
-    snake.forEach(part => {
+            const x =
+                part.x *
+                tileSize +
+                tileSize / 2;
 
-        const x =
-            part.x * tileSize +
-            tileSize / 2;
+            const y =
+                part.y *
+                tileSize +
+                tileSize / 2;
 
-        const y =
-            part.y * tileSize +
-            tileSize / 2;
+            for (
+                let i = 0;
+                i < 8;
+                i++
+            ) {
 
+                const angle =
+                    Math.random() *
+                    Math.PI * 2;
 
-        for (
-            let i = 0;
-            i < 8;
-            i++
-        ) {
+                const speed =
+                    Math.random() *
+                    7 +
+                    2;
 
-            const angle =
-                Math.random() *
-                Math.PI * 2;
+                particles.push({
 
-            const speed =
-                Math.random() * 7 + 2;
+                    x: x,
 
+                    y: y,
 
-            particles.push({
+                    vx:
+                        Math.cos(angle) *
+                        speed,
 
-                x: x,
+                    vy:
+                        Math.sin(angle) *
+                        speed,
 
-                y: y,
+                    size:
+                        Math.random() *
+                        7 +
+                        2,
 
-                vx:
-                    Math.cos(angle) *
-                    speed,
+                    life: 1
 
-                vy:
-                    Math.sin(angle) *
-                    speed,
-
-                size:
-                    Math.random() * 7 + 2,
-
-                life: 1
-            });
+                });
+            }
         }
-    });
+    );
 }
 
 
@@ -2252,74 +3739,86 @@ function createDeathExplosion() {
 
 function updateParticles() {
 
-    particles.forEach(p => {
+    particles.forEach(
+        p => {
 
-        p.x += p.vx;
+            p.x += p.vx;
 
-        p.y += p.vy;
+            p.y += p.vy;
 
-        p.vx *= 0.97;
+            p.vx *= 0.97;
 
-        p.vy *= 0.97;
+            p.vy *= 0.97;
 
-        p.vy += 0.08;
+            p.vy += 0.08;
 
-        p.life -= 0.025;
+            p.life -= 0.025;
 
-        p.size *= 0.985;
-    });
+            p.size *= 0.985;
 
+        }
+    );
 
     particles =
         particles.filter(
-            p => p.life > 0
+            p =>
+                p.life > 0
         );
 
 
-    foodParticles.forEach(p => {
+    foodParticles.forEach(
+        p => {
 
-        p.x += p.vx;
+            p.x += p.vx;
 
-        p.y += p.vy;
+            p.y += p.vy;
 
-        p.vx *= 0.96;
+            p.vx *= 0.96;
 
-        p.vy *= 0.96;
+            p.vy *= 0.96;
 
-        p.life -= 0.035;
+            p.life -= 0.035;
 
-        p.size *= 0.97;
-    });
+            p.size *= 0.97;
 
+        }
+    );
 
     foodParticles =
         foodParticles.filter(
-            p => p.life > 0
+            p =>
+                p.life > 0
         );
 
 
-    obstacleParticles.forEach(p => {
+    obstacleParticles.forEach(
+        p => {
 
-        p.x += p.vx;
+            p.x += p.vx;
 
-        p.y += p.vy;
+            p.y += p.vy;
 
-        p.vx *= 0.97;
+            p.vx *= 0.97;
 
-        p.vy *= 0.97;
+            p.vy *= 0.97;
 
-        p.vy += 0.06;
+            p.vy += 0.06;
 
-        p.life -= 0.025;
+            p.life -= 0.025;
 
-        p.size *= 0.975;
-    });
+            p.size *= 0.975;
 
+        }
+    );
 
     obstacleParticles =
         obstacleParticles.filter(
-            p => p.life > 0
+            p =>
+                p.life > 0
         );
+
+
+    updateHeartParticles();
 }
 
 
@@ -2329,90 +3828,96 @@ function updateParticles() {
 
 function drawParticles() {
 
-    particles.forEach(p => {
+    particles.forEach(
+        p => {
 
-        ctx.globalAlpha =
-            p.life;
+            ctx.globalAlpha =
+                p.life;
 
-        ctx.fillStyle =
-            currentSnakeColor.main;
+            ctx.fillStyle =
+                currentSnakeColor.main;
 
-        ctx.shadowBlur = 15;
+            ctx.shadowBlur = 15;
 
-        ctx.shadowColor =
-            currentSnakeColor.main;
+            ctx.shadowColor =
+                currentSnakeColor.main;
 
+            ctx.beginPath();
 
-        ctx.beginPath();
+            ctx.arc(
+                p.x,
+                p.y,
+                p.size,
+                0,
+                Math.PI * 2
+            );
 
-        ctx.arc(
-            p.x,
-            p.y,
-            p.size,
-            0,
-            Math.PI * 2
-        );
+            ctx.fill();
 
-        ctx.fill();
-    });
-
-
-    foodParticles.forEach(p => {
-
-        ctx.globalAlpha =
-            p.life;
-
-        ctx.fillStyle =
-            p.color ||
-            currentFruit.color;
-
-        ctx.shadowBlur = 15;
-
-        ctx.shadowColor =
-            p.color ||
-            currentFruit.glow;
+        }
+    );
 
 
-        ctx.beginPath();
+    foodParticles.forEach(
+        p => {
 
-        ctx.arc(
-            p.x,
-            p.y,
-            p.size,
-            0,
-            Math.PI * 2
-        );
+            ctx.globalAlpha =
+                p.life;
 
-        ctx.fill();
-    });
+            ctx.fillStyle =
+                p.color ||
+                currentFruit.color;
+
+            ctx.shadowBlur = 15;
+
+            ctx.shadowColor =
+                p.color ||
+                currentFruit.glow;
+
+            ctx.beginPath();
+
+            ctx.arc(
+                p.x,
+                p.y,
+                p.size,
+                0,
+                Math.PI * 2
+            );
+
+            ctx.fill();
+
+        }
+    );
 
 
-    obstacleParticles.forEach(p => {
+    obstacleParticles.forEach(
+        p => {
 
-        ctx.globalAlpha =
-            p.life;
+            ctx.globalAlpha =
+                p.life;
 
-        ctx.fillStyle =
-            p.color;
+            ctx.fillStyle =
+                p.color;
 
-        ctx.shadowBlur = 18;
+            ctx.shadowBlur = 18;
 
-        ctx.shadowColor =
-            p.color;
+            ctx.shadowColor =
+                p.color;
 
+            ctx.beginPath();
 
-        ctx.beginPath();
+            ctx.arc(
+                p.x,
+                p.y,
+                p.size,
+                0,
+                Math.PI * 2
+            );
 
-        ctx.arc(
-            p.x,
-            p.y,
-            p.size,
-            0,
-            Math.PI * 2
-        );
+            ctx.fill();
 
-        ctx.fill();
-    });
+        }
+    );
 
 
     ctx.globalAlpha = 1;
@@ -2432,7 +3937,6 @@ function update() {
     direction =
         nextDirection;
 
-
     const head = {
 
         x:
@@ -2442,19 +3946,15 @@ function update() {
         y:
             snake[0].y +
             direction.y
+
     };
 
 
     if (
-
         head.x < 0 ||
-
         head.x >= GRID ||
-
         head.y < 0 ||
-
         head.y >= GRID
-
     ) {
 
         die("wall");
@@ -2466,8 +3966,10 @@ function update() {
     const hitObstacle =
         obstacles.find(
             obstacle =>
-                obstacle.x === head.x &&
-                obstacle.y === head.y
+                obstacle.x ===
+                    head.x &&
+                obstacle.y ===
+                    head.y
         );
 
 
@@ -2479,13 +3981,12 @@ function update() {
             hitObstacle
         );
 
-
         obstacles =
             obstacles.filter(
                 obstacle =>
-                    obstacle !== hitObstacle
+                    obstacle !==
+                    hitObstacle
             );
-
 
         die("bomb");
 
@@ -2497,32 +3998,69 @@ function update() {
         head.x === food.x &&
         head.y === food.y;
 
+
+    const willGetHeart =
+        checkHeartCollision(
+            head
+        );
+
+
     const bodyLimit =
         willEat
             ? snake.length
             : snake.length - 1;
+
 
     for (
         let i = 0;
         i < bodyLimit;
         i++
     ) {
-        const part = snake[i];
+
+        const part =
+            snake[i];
 
         if (
             part.x === head.x &&
             part.y === head.y
         ) {
+
             die("self");
+
             return;
         }
     }
 
 
-    snake.unshift(head);
+    snake.unshift(
+        head
+    );
 
 
-    if (willEat) {
+    if (
+        willGetHeart
+    ) {
+
+        const collectedHeart =
+            heartItem;
+
+        createHeartCollectEffect(
+            collectedHeart.x,
+            collectedHeart.y
+        );
+
+        heartItem = null;
+
+        heartAnimationTime = 0;
+
+        gainHeart();
+
+    }
+
+
+    if (
+        willEat
+    ) {
 
         createEatEffect(
             food.x,
@@ -2530,8 +4068,8 @@ function update() {
         );
 
         playEatSound();
-        showFeedback();
 
+        showFeedback();
 
         score++;
 
@@ -2552,11 +4090,9 @@ function update() {
                 ];
 
         } while (
-
             snakeColors.length > 1 &&
             newColor.main ===
-            currentSnakeColor.main
-
+                currentSnakeColor.main
         );
 
 
@@ -2571,12 +4107,10 @@ function update() {
             highScore =
                 score;
 
-
             localStorage.setItem(
                 "theSnakeHighScore",
                 highScore
             );
-
 
             highScoreElement.textContent =
                 highScore;
@@ -2586,7 +4120,8 @@ function update() {
         gameSpeed =
             Math.max(
                 48,
-                115 - score * 3
+                115 -
+                score * 3
             );
 
 
@@ -2600,6 +4135,8 @@ function update() {
 
         spawnFood();
 
+        checkHeartSpawn();
+
     } else {
 
         snake.pop();
@@ -2611,15 +4148,25 @@ function update() {
    DIE
    ================================= */
 
-function die(reason = "self") {
+function die(
+    reason = "self"
+) {
 
-    if (deathAnimation)
+    if (
+        deathAnimation
+    ) {
         return;
-
+    }
 
     gameRunning = false;
 
-    if (reason !== "bomb") {
+    loseHeart();
+
+
+    if (
+        reason !== "bomb"
+    ) {
+
         playLoseSound();
     }
 
@@ -2627,28 +4174,52 @@ function die(reason = "self") {
     createDeathExplosion();
 
 
-    if (gameOverTimeout) {
-        clearTimeout(gameOverTimeout);
+    if (
+        gameOverTimeout
+    ) {
+
+        clearTimeout(
+            gameOverTimeout
+        );
     }
 
-    gameOverTimeout = setTimeout(
-        () => {
-            gameOverTimeout = null;
 
-            if (gameRunning) {
-                return;
-            }
+    gameOverTimeout =
+        setTimeout(
+            () => {
 
-            finalScore.textContent =
-                score;
+                gameOverTimeout =
+                    null;
 
-            gameOverReady = true;
+                if (
+                    gameRunning
+                ) {
+                    return;
+                }
 
-            gameOver.style.display =
-                "flex";
-        },
-        750
-    );
+
+                if (
+                    hearts > 0
+                ) {
+
+                    respawnAfterDeath();
+
+                    return;
+                }
+
+
+                finalScore.textContent =
+                    score;
+
+                gameOverReady =
+                    true;
+
+                gameOver.style.display =
+                    "flex";
+
+            },
+            1050
+        );
 }
 
 
@@ -2660,10 +4231,14 @@ function drawBackground() {
 
     if (
         !backgroundCache ||
-        backgroundCacheSize !== canvas.width
+        backgroundCacheSize !==
+            canvas.width
     ) {
+
         backgroundCache =
-            document.createElement("canvas");
+            document.createElement(
+                "canvas"
+            );
 
         backgroundCache.width =
             canvas.width;
@@ -2672,7 +4247,9 @@ function drawBackground() {
             canvas.height;
 
         const bgCtx =
-            backgroundCache.getContext("2d");
+            backgroundCache.getContext(
+                "2d"
+            );
 
         bgCtx.fillStyle =
             "#090909";
@@ -2694,6 +4271,7 @@ function drawBackground() {
             i <= GRID;
             i++
         ) {
+
             bgCtx.beginPath();
 
             bgCtx.moveTo(
@@ -2707,6 +4285,7 @@ function drawBackground() {
             );
 
             bgCtx.stroke();
+
 
             bgCtx.beginPath();
 
@@ -2727,6 +4306,7 @@ function drawBackground() {
             canvas.width;
     }
 
+
     ctx.drawImage(
         backgroundCache,
         0,
@@ -2741,39 +4321,37 @@ function drawBackground() {
 
 function drawFood() {
 
-    if (deathAnimation)
+    if (
+        deathAnimation
+    )
         return;
-
 
     const pulse =
         1 +
         Math.sin(foodPulse) *
         0.10;
 
-
     const x =
-        food.x * tileSize +
+        food.x *
+        tileSize +
         tileSize / 2;
 
     const y =
-        food.y * tileSize +
+        food.y *
+        tileSize +
         tileSize / 2;
 
-
     ctx.save();
-
 
     ctx.translate(
         x,
         y
     );
 
-
     ctx.scale(
         pulse,
         pulse
     );
-
 
     const type =
         currentFruit.type;
@@ -2784,13 +4362,8 @@ function drawFood() {
     ) {
 
         ctx.shadowBlur = 25;
-
-        ctx.shadowColor =
-            "#ff3030";
-
-        ctx.fillStyle =
-            "#ff3030";
-
+        ctx.shadowColor = "#ff3030";
+        ctx.fillStyle = "#ff3030";
 
         ctx.beginPath();
 
@@ -2812,7 +4385,6 @@ function drawFood() {
 
         ctx.fill();
 
-
         ctx.beginPath();
 
         ctx.arc(
@@ -2825,14 +4397,10 @@ function drawFood() {
 
         ctx.fill();
 
-
         ctx.shadowBlur = 0;
 
-        ctx.strokeStyle =
-            "#8b5a2b";
-
+        ctx.strokeStyle = "#8b5a2b";
         ctx.lineWidth = 3;
-
 
         ctx.beginPath();
 
@@ -2848,10 +4416,7 @@ function drawFood() {
 
         ctx.stroke();
 
-
-        ctx.fillStyle =
-            "#00dd55";
-
+        ctx.fillStyle = "#00dd55";
 
         ctx.beginPath();
 
@@ -2866,6 +4431,7 @@ function drawFood() {
         );
 
         ctx.fill();
+
     }
 
 
@@ -2874,13 +4440,8 @@ function drawFood() {
     ) {
 
         ctx.shadowBlur = 25;
-
-        ctx.shadowColor =
-            "#ff8c00";
-
-        ctx.fillStyle =
-            "#ff8c00";
-
+        ctx.shadowColor = "#ff8c00";
+        ctx.fillStyle = "#ff8c00";
 
         ctx.beginPath();
 
@@ -2894,14 +4455,10 @@ function drawFood() {
 
         ctx.fill();
 
-
         ctx.shadowBlur = 0;
 
-        ctx.strokeStyle =
-            "#8b5a2b";
-
+        ctx.strokeStyle = "#8b5a2b";
         ctx.lineWidth = 2;
-
 
         ctx.beginPath();
 
@@ -2917,10 +4474,7 @@ function drawFood() {
 
         ctx.stroke();
 
-
-        ctx.fillStyle =
-            "#00dd55";
-
+        ctx.fillStyle = "#00dd55";
 
         ctx.beginPath();
 
@@ -2935,6 +4489,7 @@ function drawFood() {
         );
 
         ctx.fill();
+
     }
 
 
@@ -2943,13 +4498,8 @@ function drawFood() {
     ) {
 
         ctx.shadowBlur = 25;
-
-        ctx.shadowColor =
-            "#ffe600";
-
-        ctx.fillStyle =
-            "#ffe600";
-
+        ctx.shadowColor = "#ffe600";
+        ctx.fillStyle = "#ffe600";
 
         ctx.beginPath();
 
@@ -2965,14 +4515,10 @@ function drawFood() {
 
         ctx.fill();
 
-
         ctx.shadowBlur = 0;
 
-        ctx.strokeStyle =
-            "#d0a900";
-
+        ctx.strokeStyle = "#d0a900";
         ctx.lineWidth = 2;
-
 
         ctx.beginPath();
 
@@ -2987,6 +4533,7 @@ function drawFood() {
         );
 
         ctx.stroke();
+
     }
 
 
@@ -2995,13 +4542,8 @@ function drawFood() {
     ) {
 
         ctx.shadowBlur = 25;
-
-        ctx.shadowColor =
-            "#ff1744";
-
-        ctx.fillStyle =
-            "#ff1744";
-
+        ctx.shadowColor = "#ff1744";
+        ctx.fillStyle = "#ff1744";
 
         ctx.beginPath();
 
@@ -3030,12 +4572,9 @@ function drawFood() {
 
         ctx.fill();
 
-
         ctx.shadowBlur = 0;
 
-        ctx.fillStyle =
-            "#00dd55";
-
+        ctx.fillStyle = "#00dd55";
 
         ctx.beginPath();
 
@@ -3063,10 +4602,7 @@ function drawFood() {
 
         ctx.fill();
 
-
-        ctx.fillStyle =
-            "#ffe600";
-
+        ctx.fillStyle = "#ffe600";
 
         for (
             let i = 0;
@@ -3086,7 +4622,6 @@ function drawFood() {
                     0.04
                 );
 
-
             ctx.beginPath();
 
             ctx.ellipse(
@@ -3101,6 +4636,7 @@ function drawFood() {
 
             ctx.fill();
         }
+
     }
 
 
@@ -3109,34 +4645,24 @@ function drawFood() {
     ) {
 
         ctx.shadowBlur = 25;
-
-        ctx.shadowColor =
-            "#9b59ff";
-
-        ctx.fillStyle =
-            "#9b59ff";
-
+        ctx.shadowColor = "#9b59ff";
+        ctx.fillStyle = "#9b59ff";
 
         const grapeSize =
             tileSize * 0.11;
-
 
         const grapes = [
 
             [-0.14, -0.14],
             [0.14, -0.14],
-
             [-0.21, 0.02],
             [0, 0.02],
             [0.21, 0.02],
-
             [-0.14, 0.18],
             [0.14, 0.18],
-
             [0, 0.32]
 
         ];
-
 
         grapes.forEach(
             position => {
@@ -3145,10 +4671,10 @@ function drawFood() {
 
                 ctx.arc(
                     position[0] *
-                    tileSize,
+                        tileSize,
 
                     position[1] *
-                    tileSize,
+                        tileSize,
 
                     grapeSize,
 
@@ -3160,14 +4686,10 @@ function drawFood() {
             }
         );
 
-
         ctx.shadowBlur = 0;
 
-        ctx.strokeStyle =
-            "#8b5a2b";
-
+        ctx.strokeStyle = "#8b5a2b";
         ctx.lineWidth = 2;
-
 
         ctx.beginPath();
 
@@ -3183,10 +4705,7 @@ function drawFood() {
 
         ctx.stroke();
 
-
-        ctx.fillStyle =
-            "#00dd55";
-
+        ctx.fillStyle = "#00dd55";
 
         ctx.beginPath();
 
@@ -3201,6 +4720,7 @@ function drawFood() {
         );
 
         ctx.fill();
+
     }
 
 
@@ -3209,13 +4729,8 @@ function drawFood() {
     ) {
 
         ctx.shadowBlur = 25;
-
-        ctx.shadowColor =
-            "#00ff66";
-
-        ctx.fillStyle =
-            "#00dd55";
-
+        ctx.shadowColor = "#00ff66";
+        ctx.fillStyle = "#00dd55";
 
         ctx.beginPath();
 
@@ -3229,10 +4744,7 @@ function drawFood() {
 
         ctx.fill();
 
-
-        ctx.fillStyle =
-            "#ff4d6d";
-
+        ctx.fillStyle = "#ff4d6d";
 
         ctx.beginPath();
 
@@ -3246,10 +4758,7 @@ function drawFood() {
 
         ctx.fill();
 
-
-        ctx.fillStyle =
-            "#050505";
-
+        ctx.fillStyle = "#050505";
 
         const seeds = [
 
@@ -3261,7 +4770,6 @@ function drawFood() {
 
         ];
 
-
         seeds.forEach(
             seed => {
 
@@ -3269,17 +4777,16 @@ function drawFood() {
 
                 ctx.ellipse(
                     seed[0] *
-                    tileSize,
+                        tileSize,
 
                     seed[1] *
-                    tileSize,
+                        tileSize,
 
                     tileSize * 0.025,
 
                     tileSize * 0.045,
 
                     0,
-
                     0,
                     Math.PI * 2
                 );
@@ -3288,10 +4795,7 @@ function drawFood() {
             }
         );
 
-
-        ctx.strokeStyle =
-            "#00ff66";
-
+        ctx.strokeStyle = "#00ff66";
         ctx.lineWidth = 2;
 
         ctx.beginPath();
@@ -3327,16 +4831,13 @@ function drawSnake() {
             )
             : 1;
 
-
     ctx.globalAlpha =
         alpha;
-
 
     snake.forEach(
         (part, index) => {
 
             let color;
-
 
             if (
                 eatColorEffect > 0
@@ -3355,10 +4856,8 @@ function drawSnake() {
                         : currentSnakeColor.body;
             }
 
-
             ctx.fillStyle =
                 color;
-
 
             ctx.shadowBlur =
                 index === 0
@@ -3368,39 +4867,39 @@ function drawSnake() {
             ctx.shadowColor =
                 color;
 
-
             const padding =
                 tileSize * 0.07;
-
 
             ctx.beginPath();
 
             ctx.roundRect(
 
-                part.x * tileSize +
-                padding,
+                part.x *
+                    tileSize +
+                    padding,
 
-                part.y * tileSize +
-                padding,
+                part.y *
+                    tileSize +
+                    padding,
 
                 tileSize -
-                padding * 2,
+                    padding * 2,
 
                 tileSize -
-                padding * 2,
+                    padding * 2,
 
                 tileSize * 0.18
+
             );
 
             ctx.fill();
+
         }
     );
-
 
     ctx.shadowBlur = 0;
 
     ctx.globalAlpha = 1;
-
 
     if (!deathAnimation)
         drawEyes();
@@ -3416,12 +4915,11 @@ function drawEyes() {
     const head =
         snake[0];
 
-
     ctx.fillStyle =
         "#050505";
 
-
     let eye1;
+
     let eye2;
 
 
@@ -3430,107 +4928,109 @@ function drawEyes() {
     ) {
 
         eye1 = {
-
             x:
-                head.x * tileSize +
+                head.x *
+                tileSize +
                 tileSize * 0.72,
-
             y:
-                head.y * tileSize +
+                head.y *
+                tileSize +
                 tileSize * 0.30
         };
 
-
         eye2 = {
-
             x:
-                head.x * tileSize +
+                head.x *
+                tileSize +
                 tileSize * 0.72,
-
             y:
-                head.y * tileSize +
+                head.y *
+                tileSize +
                 tileSize * 0.70
         };
 
+    }
 
-    } else if (
+
+    else if (
         direction.x === -1
     ) {
 
         eye1 = {
-
             x:
-                head.x * tileSize +
+                head.x *
+                tileSize +
                 tileSize * 0.28,
-
             y:
-                head.y * tileSize +
+                head.y *
+                tileSize +
                 tileSize * 0.30
         };
 
-
         eye2 = {
-
             x:
-                head.x * tileSize +
+                head.x *
+                tileSize +
                 tileSize * 0.28,
-
             y:
-                head.y * tileSize +
+                head.y *
+                tileSize +
                 tileSize * 0.70
         };
 
+    }
 
-    } else if (
+
+    else if (
         direction.y === -1
     ) {
 
         eye1 = {
-
             x:
-                head.x * tileSize +
+                head.x *
+                tileSize +
                 tileSize * 0.30,
-
             y:
-                head.y * tileSize +
+                head.y *
+                tileSize +
                 tileSize * 0.28
         };
-
 
         eye2 = {
-
             x:
-                head.x * tileSize +
+                head.x *
+                tileSize +
                 tileSize * 0.70,
-
             y:
-                head.y * tileSize +
+                head.y *
+                tileSize +
                 tileSize * 0.28
         };
 
+    }
 
-    } else {
+
+    else {
 
         eye1 = {
-
             x:
-                head.x * tileSize +
+                head.x *
+                tileSize +
                 tileSize * 0.30,
-
             y:
-                head.y * tileSize +
+                head.y *
+                tileSize +
                 tileSize * 0.72
         };
 
-
         eye2 = {
-
             x:
-                head.x * tileSize +
+                head.x *
+                tileSize +
                 tileSize * 0.70,
-
             y:
-                head.y * tileSize +
+                head.y *
+                tileSize +
                 tileSize * 0.72
         };
     }
@@ -3579,16 +5079,18 @@ function draw() {
         ctx.translate(
 
             (Math.random() - 0.5) *
-            screenShake,
+                screenShake,
 
             (Math.random() - 0.5) *
-            screenShake
+                screenShake
+
         );
 
-
         screenShake *=
-            Math.pow(0.88, frameScale);
-
+            Math.pow(
+                0.88,
+                frameScale
+            );
 
         if (
             screenShake < 0.2
@@ -3605,9 +5107,13 @@ function draw() {
 
     drawFood();
 
+    drawHeartItem();
+
     drawSnake();
 
     drawParticles();
+
+    drawHeartParticles();
 
 
     if (
@@ -3622,7 +5128,6 @@ function draw() {
                 ${redFlash * 0.22}
             )`;
 
-
         ctx.fillRect(
             0,
             0,
@@ -3630,9 +5135,11 @@ function draw() {
             canvas.height
         );
 
-
         redFlash *=
-            Math.pow(0.90, frameScale);
+            Math.pow(
+                0.90,
+                frameScale
+            );
     }
 
 
@@ -3648,7 +5155,6 @@ function draw() {
                 ${obstacleFlash * 0.18}
             )`;
 
-
         ctx.fillRect(
             0,
             0,
@@ -3656,9 +5162,11 @@ function draw() {
             canvas.height
         );
 
-
         obstacleFlash *=
-            Math.pow(0.88, frameScale);
+            Math.pow(
+                0.88,
+                frameScale
+            );
     }
 
 
@@ -3679,12 +5187,30 @@ function gameLoop(time) {
         );
 
     frameScale =
-        Math.max(0, elapsed) / 16.6667;
+        Math.max(
+            0,
+            elapsed
+        ) / 16.6667;
 
     updateParticles();
 
     foodPulse +=
-        Math.max(0, elapsed) * 0.0048;
+        Math.max(
+            0,
+            elapsed
+        ) * 0.0048;
+
+
+    if (
+        heartItem
+    ) {
+
+        heartAnimationTime +=
+            Math.max(
+                0,
+                elapsed
+            );
+    }
 
 
     if (
@@ -3692,8 +5218,10 @@ function gameLoop(time) {
     ) {
 
         eatColorEffect *=
-            Math.pow(0.91, frameScale);
-
+            Math.pow(
+                0.91,
+                frameScale
+            );
 
         if (
             eatColorEffect < 0.02
@@ -3709,7 +5237,10 @@ function gameLoop(time) {
     ) {
 
         deathTimer +=
-            Math.max(0, elapsed) / 1000;
+            Math.max(
+                0,
+                elapsed
+            ) / 1000;
     }
 
 
@@ -3730,23 +5261,28 @@ function gameLoop(time) {
     }
 
 
-    draw();
+    if (
+        lastRenderTime === 0 ||
+        time -
+            lastRenderTime >=
+            renderInterval
+    ) {
+
+        draw();
+
+        lastRenderTime =
+            time;
+    }
 
 
     if (
-
         gameRunning ||
-
         particles.length > 0 ||
-
         foodParticles.length > 0 ||
-
         obstacleParticles.length > 0 ||
-
+        heartParticles.length > 0 ||
         redFlash > 0 ||
-
         obstacleFlash > 0
-
     ) {
 
         animationFrameId =
@@ -3756,7 +5292,8 @@ function gameLoop(time) {
 
     } else {
 
-        animationFrameId = null;
+        animationFrameId =
+            null;
     }
 }
 
@@ -3774,10 +5311,8 @@ document.addEventListener(
 
 
         if (
-
             key === "w" ||
             key === "arrowup"
-
         ) {
 
             event.preventDefault();
@@ -3795,10 +5330,8 @@ document.addEventListener(
 
 
         else if (
-
             key === "s" ||
             key === "arrowdown"
-
         ) {
 
             event.preventDefault();
@@ -3816,10 +5349,8 @@ document.addEventListener(
 
 
         else if (
-
             key === "a" ||
             key === "arrowleft"
-
         ) {
 
             event.preventDefault();
@@ -3837,10 +5368,8 @@ document.addEventListener(
 
 
         else if (
-
             key === "d" ||
             key === "arrowright"
-
         ) {
 
             event.preventDefault();
@@ -3867,6 +5396,7 @@ document.addEventListener(
 
             restartGame();
         }
+
     }
 );
 
@@ -3884,6 +5414,7 @@ function setDirection(
         x === -nextDirection.x &&
         y === -nextDirection.y
     ) {
+
         return;
     }
 
@@ -3911,19 +5442,22 @@ async function toggleFullscreen() {
                     .requestFullscreen
             ) {
 
-                await document.documentElement
+                await document
+                    .documentElement
                     .requestFullscreen();
 
             } else {
 
-                document.body.classList.add(
-                    "mobileFullscreen"
-                );
+                document.body.classList
+                    .add(
+                        "mobileFullscreen"
+                    );
             }
 
         } else {
 
-            await document.exitFullscreen();
+            await document
+                .exitFullscreen();
         }
 
     } catch (error) {
@@ -3970,6 +5504,7 @@ document.addEventListener(
 
             draw();
         }
+
     }
 );
 
@@ -3991,6 +5526,7 @@ window.addEventListener(
 
             draw();
         }
+
     }
 );
 
@@ -3999,13 +5535,20 @@ document.addEventListener(
     "visibilitychange",
     () => {
 
-        lastTime = performance.now();
+        lastTime =
+            performance.now();
 
         touchActive = false;
-        touchDirectionLocked = false;
+
+        touchDirectionLocked =
+            false;
+
         touchPointerId = null;
+
     },
-    { passive: true }
+    {
+        passive: true
+    }
 );
 
 
